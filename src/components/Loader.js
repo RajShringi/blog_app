@@ -1,7 +1,7 @@
 function Loader() {
   return (
     <div className="text-center">
-      <div className="animate-spin w-8 h-8 border-4 rounded-full inline-block  border-t-transparent border-green-400"></div>
+      <div className="animate-spin w-8 h-8 border-4 rounded-full inline-block  border-t-transparent border-indigo-400"></div>
     </div>
   );
 }
