@@ -5,7 +5,7 @@ import Home from "./Home";
 class App extends React.Component {
   render() {
     return (
-      <div className="h-screen overflow-y-scroll text-gray-700">
+      <div className="h-screen overflow-y-scroll text-gray-700 bg-gray-50">
         <BrowserRouter>
           <Header />
           <Switch>
