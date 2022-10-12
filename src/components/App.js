@@ -1,12 +1,17 @@
 import React from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
+import Header from "./Header";
+import Home from "./Home";
 class App extends React.Component {
   render() {
     return (
-      <div className="h-screen overflow-y-scroll">
+      <div className="h-screen overflow-y-scroll text-gray-700">
         <BrowserRouter>
+          <Header />
           <Switch>
-            <Route path="/" exact></Route>
+            <Route path="/" exact>
+              <Home />
+            </Route>
           </Switch>
         </BrowserRouter>
       </div>
