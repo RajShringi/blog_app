@@ -16,7 +16,7 @@ function Header() {
                 Home
               </li>
             </NavLink>
-            <NavLink to="/singin" activeClassName="text-indigo-400">
+            <NavLink to="/login" activeClassName="text-indigo-400">
               <li className="mx-6 p-2 cursor-pointer hover:text-indigo-400">
                 Sign in
               </li>
