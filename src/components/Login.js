@@ -5,6 +5,7 @@ class Login extends React.Component {
   render() {
     const { email, password, emailError, passwordError, handleChange } =
       this.props;
+
     return (
       <form
         className="bg-white p-4 max-w-xl mx-auto my-4 shadow-sm rounded-lg"

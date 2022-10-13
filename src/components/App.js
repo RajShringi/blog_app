@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import Header from "./Header";
 import Home from "./Home";
+import IndividualArticle from "./IndividualArticle";
 import Login from "./Login";
 import Singup from "./Signup";
 
@@ -63,6 +64,7 @@ class App extends React.Component {
             <Route path="/" exact>
               <Home />
             </Route>
+
             <Route path="/login">
               <Login
                 email={email}
@@ -72,6 +74,7 @@ class App extends React.Component {
                 handleChange={this.handleChange}
               />
             </Route>
+
             <Route path="/signup">
               <Singup
                 email={email}
@@ -83,6 +86,8 @@ class App extends React.Component {
                 handleChange={this.handleChange}
               />
             </Route>
+
+            <Route path="/article/:slug" component={IndividualArticle} />
           </Switch>
         </BrowserRouter>
       </div>

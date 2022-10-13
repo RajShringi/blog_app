@@ -1,5 +1,6 @@
 import moment from "moment";
 import { AiFillHeart } from "react-icons/ai";
+import { NavLink } from "react-router-dom";
 
 function Article({ article }) {
   return (
@@ -26,15 +27,21 @@ function Article({ article }) {
       </header>
 
       <div>
-        <h2 className="text-2xl font-bold text-indigo-400">{article.title}</h2>
+        <NavLink to={`/article/${article.slug}`}>
+          <h2 className="text-2xl font-bold text-indigo-400">
+            {article.title}
+          </h2>
+        </NavLink>
         <p className="my-4">
           {article.description && article.description.substring(0, 200)}
           ...
         </p>
         <p className="text-sm my-4">{article.tagList}</p>
-        <button className="text-sm p-2 bg-indigo-400 text-white inline-block rounded-lg hover:bg-indigo-500">
-          Read More
-        </button>
+        <NavLink to={`/article/${article.slug}`}>
+          <button className="text-sm p-2 bg-indigo-400 text-white inline-block rounded-lg hover:bg-indigo-500">
+            Read More
+          </button>
+        </NavLink>
       </div>
     </article>
   );
