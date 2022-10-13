@@ -1,19 +1,41 @@
 import React from "react";
 
-class Login extends React.Component {
+class Singup extends React.Component {
   render() {
-    const { email, password, emailError, passwordError, handleChange } =
-      this.props;
+    const {
+      email,
+      password,
+      username,
+      emailError,
+      passwordError,
+      usernameError,
+      handleChange,
+    } = this.props;
     return (
       <form
         className="bg-white p-4 max-w-xl mx-auto my-4 shadow-sm rounded-lg"
         onSubmit={this.handleSubmit}
       >
         <div className="my-4 text-center">
-          <h1 className="text-4xl font-medium">Sign In</h1>
+          <h1 className="text-4xl font-medium">Sign Up</h1>
           <p className="text-sm text-indigo-400 cursor-pointer">
-            Need an account?
+            Have an account?
           </p>
+        </div>
+
+        <div className="my-4">
+          <label className="text-sm text-gray-600 font-medium">Username</label>
+          <input
+            className="block w-full border p-2 shadow-inner rounded-lg"
+            type="text"
+            placeholder="Username"
+            name="username"
+            value={username}
+            onChange={handleChange}
+          />
+          <span className="inline-block text-red-400 font-medium text-sm">
+            {usernameError}
+          </span>
         </div>
 
         <div className="my-4">
@@ -55,5 +77,4 @@ class Login extends React.Component {
     );
   }
 }
-
-export default Login;
+export default Singup;
