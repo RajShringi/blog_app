@@ -1,4 +1,5 @@
 import React from "react";
+import { NavLink } from "react-router-dom";
 
 class Login extends React.Component {
   render() {
@@ -10,10 +11,12 @@ class Login extends React.Component {
         onSubmit={this.handleSubmit}
       >
         <div className="my-4 text-center">
-          <h1 className="text-4xl font-medium">Sign In</h1>
-          <p className="text-sm text-indigo-400 cursor-pointer">
-            Need an account?
-          </p>
+          <h1 className="text-4xl font-medium mb-2">Sign In</h1>
+          <NavLink to="/signup">
+            <p className="text-sm text-indigo-400 cursor-pointer">
+              Need an account?
+            </p>
+          </NavLink>
         </div>
 
         <div className="my-4">

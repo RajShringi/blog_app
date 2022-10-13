@@ -1,4 +1,5 @@
 import React from "react";
+import { NavLink } from "react-router-dom";
 
 class Singup extends React.Component {
   render() {
@@ -11,16 +12,19 @@ class Singup extends React.Component {
       usernameError,
       handleChange,
     } = this.props;
+
     return (
       <form
         className="bg-white p-4 max-w-xl mx-auto my-4 shadow-sm rounded-lg"
         onSubmit={this.handleSubmit}
       >
         <div className="my-4 text-center">
-          <h1 className="text-4xl font-medium">Sign Up</h1>
-          <p className="text-sm text-indigo-400 cursor-pointer">
-            Have an account?
-          </p>
+          <h1 className="text-4xl font-medium mb-2">Sign Up</h1>
+          <NavLink to="/login">
+            <p className="text-sm text-indigo-400 cursor-pointer">
+              Have an account?
+            </p>
+          </NavLink>
         </div>
 
         <div className="my-4">
