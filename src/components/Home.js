@@ -15,6 +15,7 @@ class Home extends React.Component {
       offset: 1,
     };
   }
+
   async componentDidMount() {
     try {
       const { tags } = await myfetch(
@@ -34,6 +35,7 @@ class Home extends React.Component {
       console.log(err);
     }
   }
+
   handleFetchPagination = async (value) => {
     this.setState({
       articles: null,
@@ -62,9 +64,6 @@ class Home extends React.Component {
   };
 
   handleClickTag = async (tag) => {
-    console.log(
-      `https://mighty-oasis-08080.herokuapp.com/api/articles?tag=${tag}&limit=10&offset=0`
-    );
     this.setState({
       articles: null,
     });
@@ -128,6 +127,8 @@ class Home extends React.Component {
                 </li>
               </ul>
             </nav>
+
+            {/* Articles */}
             <div>
               {!articles ? (
                 <Loader />
@@ -141,6 +142,8 @@ class Home extends React.Component {
               )}
             </div>
           </div>
+
+          {/* Tags */}
           <div className="w-[30%] bg-gray-100 p-2 rounded-lg">
             {!tags ? (
               <Loader />
