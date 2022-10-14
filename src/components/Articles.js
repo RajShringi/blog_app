@@ -1,6 +1,6 @@
 import Article from "./Article";
 
-function Articles({ articles, pages, offset, handleFetchPagination }) {
+function Articles({ articles, pages, activePageIndex, handleFetchPagination }) {
   return (
     <div>
       {/* Articles */}
@@ -16,7 +16,9 @@ function Articles({ articles, pages, offset, handleFetchPagination }) {
               key={index}
               onClick={() => handleFetchPagination(page)}
               className={`border p-1 text-center rounded-lg cursor-pointer ${
-                offset === page ? "bg-indigo-400 text-white" : "bg-white"
+                activePageIndex === page
+                  ? "bg-indigo-400 text-white"
+                  : "bg-white"
               }`}
             >
               {page}

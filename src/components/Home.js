@@ -3,7 +3,7 @@ import Loader from "./Loader";
 import Tags from "./Tags";
 import { myfetch } from "../utils/api";
 import Articles from "./Articles";
-import { articleURL, ROOT_URL } from "../utils/constant";
+import { articleURL } from "../utils/constant";
 
 class Home extends React.Component {
   constructor(props) {
@@ -12,21 +12,27 @@ class Home extends React.Component {
       articles: null,
       articlesCount: null,
       userSelectedTag: null,
-      offset: 1,
+      activePageIndex: 1,
+      error: null,
+      articlesPerPage: 10,
     };
   }
 
   async componentDidMount() {
     try {
       const { articles, articlesCount } = await myfetch(
-        `${articleURL}?limit=10&offset=${this.state.offset * 10 - 10}`
+        `${articleURL}?limit=${this.state.articlesPerPage}&offset=${
+          this.state.activePageIndex * 10 - 10
+        }`
       );
       this.setState({
         articles,
         articlesCount,
       });
     } catch (err) {
-      console.log(err.message);
+      this.setState({
+        error: err.message,
+      });
     }
   }
 
@@ -34,23 +40,29 @@ class Home extends React.Component {
     this.setState({
       articles: null,
     });
-    const offset = value;
+    const activePageIndex = value;
     const { userSelectedTag } = this.state;
     let articles, data;
-    if (userSelectedTag === null) {
-      data = await myfetch(`${articleURL}?limit=10&offset=${offset * 10 - 10}`);
-    } else {
-      data = await myfetch(
-        `${articleURL}?tag=${userSelectedTag}&limit=10&offset=${
-          offset * 10 - 10
-        }`
-      );
+    let limit = this.state.articlesPerPage;
+    let offset = activePageIndex * 10 - 10;
+    try {
+      if (userSelectedTag === null) {
+        data = await myfetch(`${articleURL}?limit=${limit}&offset=${offset}`);
+      } else {
+        data = await myfetch(
+          `${articleURL}?tag=${userSelectedTag}&limit=${limit}&offset=${offset}`
+        );
+      }
+      articles = data.articles;
+      this.setState({
+        activePageIndex,
+        articles,
+      });
+    } catch (error) {
+      this.setState({
+        error: error.message,
+      });
     }
-    articles = data.articles;
-    this.setState({
-      offset,
-      articles,
-    });
   };
 
   handleClickTag = async (tag) => {
@@ -70,15 +82,24 @@ class Home extends React.Component {
       articles,
       articlesCount,
       userSelectedTag: tag,
-      offset: 1,
+      activePageIndex: 1,
     });
   };
 
   render() {
-    const { articles, articlesCount, offset, userSelectedTag } = this.state;
+    const { articles, articlesCount, activePageIndex, userSelectedTag, error } =
+      this.state;
     const pages = [];
     for (let i = 1; i <= Math.ceil(articlesCount / 10); i++) {
       pages.push(i);
+    }
+
+    if (error) {
+      return (
+        <p className="text-center my-4 text-lg font-bold">
+          Couldn't fetch the articles
+        </p>
+      );
     }
 
     return (
@@ -121,7 +142,7 @@ class Home extends React.Component {
                 <Articles
                   articles={articles}
                   pages={pages}
-                  offset={offset}
+                  activePageIndex={activePageIndex}
                   handleFetchPagination={this.handleFetchPagination}
                 />
               )}
