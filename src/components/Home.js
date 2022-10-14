@@ -3,6 +3,7 @@ import Loader from "./Loader";
 import Tags from "./Tags";
 import { myfetch } from "../utils/api";
 import Articles from "./Articles";
+import { articleURL, ROOT_URL } from "../utils/constant";
 
 class Home extends React.Component {
   constructor(props) {
@@ -18,13 +19,9 @@ class Home extends React.Component {
 
   async componentDidMount() {
     try {
-      const { tags } = await myfetch(
-        "https://mighty-oasis-08080.herokuapp.com/api/tags"
-      );
+      const { tags } = await myfetch(ROOT_URL + "/tags");
       const { articles, articlesCount } = await myfetch(
-        `https://mighty-oasis-08080.herokuapp.com/api/articles?limit=10&offset=${
-          this.state.offset * 10 - 10
-        }`
+        `${articleURL}?limit=10&offset=${this.state.offset * 10 - 10}`
       );
       this.setState({
         tags,
@@ -44,14 +41,10 @@ class Home extends React.Component {
     const { userSelectedTag } = this.state;
     let articles, data;
     if (userSelectedTag === null) {
-      data = await myfetch(
-        `https://mighty-oasis-08080.herokuapp.com/api/articles?limit=10&offset=${
-          offset * 10 - 10
-        }`
-      );
+      data = await myfetch(`${articleURL}?limit=10&offset=${offset * 10 - 10}`);
     } else {
       data = await myfetch(
-        `https://mighty-oasis-08080.herokuapp.com/api/articles?tag=${userSelectedTag}&limit=10&offset=${
+        `${articleURL}?tag=${userSelectedTag}&limit=10&offset=${
           offset * 10 - 10
         }`
       );
@@ -69,14 +62,10 @@ class Home extends React.Component {
     });
     let articles, data, articlesCount;
     if (tag === null) {
-      data = await myfetch(
-        `https://mighty-oasis-08080.herokuapp.com/api/articles?limit=10&offset=0`
-      );
+      data = await myfetch(`${articleURL}?limit=10&offset=0`);
     } else {
       let newTag = tag.replace(/#/gi, "%23");
-      data = await myfetch(
-        `https://mighty-oasis-08080.herokuapp.com/api/articles?tag=${newTag}&limit=10&offset=0`
-      );
+      data = await myfetch(`${articleURL}?tag=${newTag}&limit=10&offset=0`);
     }
     articles = data.articles;
     articlesCount = data.articlesCount;

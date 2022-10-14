@@ -4,8 +4,8 @@ function Articles({ articles, pages, offset, handleFetchPagination }) {
   return (
     <div>
       {/* Articles */}
-      {articles.map((article, index) => (
-        <Article key={index} article={article} />
+      {articles.map((article) => (
+        <Article key={article.slug} article={article} />
       ))}
 
       {/* Pagination */}

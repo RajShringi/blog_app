@@ -1,5 +1,6 @@
 import moment from "moment";
 import { AiFillHeart } from "react-icons/ai";
+import { BsEmojiSmile } from "react-icons/bs";
 import { NavLink } from "react-router-dom";
 
 function Article({ article }) {
@@ -7,11 +8,15 @@ function Article({ article }) {
     <article className="my-4 bg-white p-4 shadow-sm rounded-lg">
       <header className="flex justify-between items-center mb-4">
         <div className="flex justify-between items-center">
-          <img
-            className="h-10 w-10 object-cover rounded-full border-2 border-indigo-400 mr-4"
-            src={article.author.image}
-            alt={article.author.username}
-          />
+          {article.author.image ? (
+            <img
+              className="h-10 w-10 object-cover rounded-full border-2 border-indigo-400 mr-4"
+              src={article.author.image}
+              alt={article.author.username}
+            />
+          ) : (
+            <BsEmojiSmile className="h-10 w-10 text-indigo-400 mr-4" />
+          )}
           <div>
             <p className="text-sm text-indigo-400">{article.author.username}</p>
             <p className="text-xs">
@@ -28,8 +33,8 @@ function Article({ article }) {
 
       <div>
         <NavLink to={`/article/${article.slug}`}>
-          <h2 className="text-2xl font-bold text-indigo-400">
-            {article.title}
+          <h2 className="text-2xl font-bold text-indigo-400 break-words">
+            {article.title.substring(0, 100)}
           </h2>
         </NavLink>
         <p className="my-4">
