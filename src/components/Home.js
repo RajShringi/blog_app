@@ -20,9 +20,10 @@ class Home extends React.Component {
 
   async componentDidMount() {
     try {
+      const limit = this.state.articlesPerPage;
       const { articles, articlesCount } = await myfetch(
-        `${articleURL}?limit=${this.state.articlesPerPage}&offset=${
-          this.state.activePageIndex * 10 - 10
+        `${articleURL}?limit=${limit}&offset=${
+          (this.state.activePageIndex - 1) * limit
         }`
       );
       this.setState({
@@ -43,8 +44,8 @@ class Home extends React.Component {
     const activePageIndex = value;
     const { userSelectedTag } = this.state;
     let articles, data;
-    let limit = this.state.articlesPerPage;
-    let offset = activePageIndex * 10 - 10;
+    const limit = this.state.articlesPerPage;
+    const offset = (activePageIndex - 1) * 10;
     try {
       if (userSelectedTag === null) {
         data = await myfetch(`${articleURL}?limit=${limit}&offset=${offset}`);
