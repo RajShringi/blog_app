@@ -10,7 +10,6 @@ class Home extends React.Component {
     super();
     this.state = {
       articles: null,
-      tags: null,
       articlesCount: null,
       userSelectedTag: null,
       offset: 1,
@@ -19,12 +18,10 @@ class Home extends React.Component {
 
   async componentDidMount() {
     try {
-      const { tags } = await myfetch(ROOT_URL + "/tags");
       const { articles, articlesCount } = await myfetch(
         `${articleURL}?limit=10&offset=${this.state.offset * 10 - 10}`
       );
       this.setState({
-        tags,
         articles,
         articlesCount,
       });
@@ -78,8 +75,7 @@ class Home extends React.Component {
   };
 
   render() {
-    const { tags, articles, articlesCount, offset, userSelectedTag } =
-      this.state;
+    const { articles, articlesCount, offset, userSelectedTag } = this.state;
     const pages = [];
     for (let i = 1; i <= Math.ceil(articlesCount / 10); i++) {
       pages.push(i);
@@ -134,11 +130,7 @@ class Home extends React.Component {
 
           {/* Tags */}
           <div className="w-[30%] bg-gray-100 p-2 rounded-lg">
-            {!tags ? (
-              <Loader />
-            ) : (
-              <Tags tags={tags} handleClickTag={this.handleClickTag} />
-            )}
+            <Tags handleClickTag={this.handleClickTag} />
           </div>
         </div>
       </>
