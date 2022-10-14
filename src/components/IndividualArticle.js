@@ -8,21 +8,36 @@ class IndividualArticle extends React.Component {
     super();
     this.state = {
       article: null,
+      error: null,
     };
   }
 
   async componentDidMount() {
-    const { article } = await myfetch(
-      `https://mighty-oasis-08080.herokuapp.com/api/articles/${this.props.match.params.slug}`
-    );
-    this.setState({
-      article,
-    });
+    try {
+      const { article } = await myfetch(
+        `https://mighty-oasis-08080.herokuapp.com/api/articles/${this.props.match.params.slug}`
+      );
+      this.setState({
+        article,
+      });
+    } catch (error) {
+      this.setState({
+        error: error.message,
+      });
+    }
   }
 
   render() {
-    const { article } = this.state;
+    const { article, error } = this.state;
+
     const paragrphs = article && article.body.split("\n\n");
+    if (error) {
+      return (
+        <p className="text-center my-4 text-lg font-bold">
+          Couldn't fetch the article
+        </p>
+      );
+    }
 
     return (
       <div>
