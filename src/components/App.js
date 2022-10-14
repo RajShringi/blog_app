@@ -4,6 +4,7 @@ import Header from "./Header";
 import Home from "./Home";
 import IndividualArticle from "./IndividualArticle";
 import Login from "./Login";
+import NoMatch from "./NoMatch";
 import Singup from "./Signup";
 
 class App extends React.Component {
@@ -88,6 +89,8 @@ class App extends React.Component {
             </Route>
 
             <Route path="/article/:slug" component={IndividualArticle} />
+            <NoMatch />
+            <Route path="*"></Route>
           </Switch>
         </BrowserRouter>
       </div>

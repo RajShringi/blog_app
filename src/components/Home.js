@@ -32,7 +32,7 @@ class Home extends React.Component {
         articlesCount,
       });
     } catch (err) {
-      console.log(err);
+      console.log(err.message);
     }
   }
 
