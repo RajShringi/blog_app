@@ -16,6 +16,8 @@ class App extends React.Component {
     email: "",
     password: "",
     username: "",
+    serverError: "",
+    isLoading: false,
     errors: {
       email: "",
       password: "",
@@ -35,6 +37,9 @@ class App extends React.Component {
 
   handleSignup = async (e) => {
     e.preventDefault();
+    this.setState({
+      isLoading: true,
+    });
     const { username, email, password } = this.state;
     const userInfo = {
       user: {
@@ -56,13 +61,16 @@ class App extends React.Component {
       const data = await res.json();
       if (data.errors) {
         this.setState({
-          errors: { ...this.state.errors, ...data.errors },
+          serverError: data.errors,
+          isLoading: false,
         });
         return;
       }
       localStorage.setItem("user", JSON.stringify(data));
       this.setState({
         user: { ...data.user },
+        isLoading: false,
+        serverError: "",
       });
     } catch (error) {
       console.log(error);
@@ -71,6 +79,9 @@ class App extends React.Component {
 
   handleLogin = async (e) => {
     e.preventDefault();
+    this.setState({
+      isLoading: true,
+    });
     const { email, password } = this.state;
     const userInfo = {
       user: {
@@ -91,13 +102,16 @@ class App extends React.Component {
       const data = await res.json();
       if (data.errors) {
         this.setState({
-          errors: { ...this.state.errors, ...data.errors },
+          serverError: data.errors,
+          isLoading: false,
         });
         return;
       }
-      localStorage.setItem("user", JSON.stringify(data));
+      localStorage.setItem("user", JSON.stringify(data.user));
       this.setState({
         user: { ...data.user },
+        isLoading: false,
+        serverError: "",
       });
     } catch (error) {
       console.log(error);
@@ -105,7 +119,8 @@ class App extends React.Component {
   };
 
   render() {
-    const { email, password, username, user } = this.state;
+    const { email, password, username, user, isLoading, serverError } =
+      this.state;
     const {
       email: emailError,
       password: passwordError,
@@ -130,6 +145,8 @@ class App extends React.Component {
                   passwordError={passwordError}
                   handleChange={this.handleChange}
                   handleLogin={this.handleLogin}
+                  isLoading={isLoading}
+                  serverError={serverError}
                 />
               ) : (
                 <Redirect to="/" />
@@ -147,6 +164,8 @@ class App extends React.Component {
                   usernameError={usernameError}
                   handleChange={this.handleChange}
                   handleSignup={this.handleSignup}
+                  isLoading={isLoading}
+                  serverError={serverError}
                 />
               ) : (
                 <Redirect to="/" />

@@ -1,5 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+import Loader from "./Loader";
 
 class Login extends React.Component {
   render() {
@@ -10,7 +11,13 @@ class Login extends React.Component {
       passwordError,
       handleChange,
       handleLogin,
+      isLoading,
+      serverError,
     } = this.props;
+
+    if (isLoading) {
+      return <Loader />;
+    }
 
     return (
       <form
@@ -25,6 +32,17 @@ class Login extends React.Component {
             </p>
           </NavLink>
         </div>
+
+        {Object.keys(serverError).map((error) => {
+          return (
+            <p
+              key={error}
+              className="inline-block text-red-400 font-medium text-sm"
+            >
+              {error} {serverError[error]}
+            </p>
+          );
+        })}
 
         <div className="my-4">
           <label className="text-sm text-gray-600 font-medium">Email</label>
