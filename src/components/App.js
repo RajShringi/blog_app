@@ -12,7 +12,7 @@ import { ROOT_URL } from "../utils/constant";
 
 class App extends React.Component {
   state = {
-    user: "",
+    token: "",
     email: "",
     password: "",
     username: "",
@@ -66,9 +66,9 @@ class App extends React.Component {
         });
         return;
       }
-      localStorage.setItem("user", JSON.stringify(data));
+      localStorage.setItem("token", JSON.stringify(data.user.token));
       this.setState({
-        user: { ...data.user },
+        token: data.user.token,
         isLoading: false,
         serverError: "",
       });
@@ -107,9 +107,9 @@ class App extends React.Component {
         });
         return;
       }
-      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("token", JSON.stringify(data.user.token));
       this.setState({
-        user: { ...data.user },
+        token: data.user.token,
         isLoading: false,
         serverError: "",
       });
@@ -119,7 +119,7 @@ class App extends React.Component {
   };
 
   render() {
-    const { email, password, username, user, isLoading, serverError } =
+    const { email, password, username, token, isLoading, serverError } =
       this.state;
     const {
       email: emailError,
@@ -130,14 +130,14 @@ class App extends React.Component {
     return (
       <div className="h-screen overflow-y-scroll text-gray-700 bg-gray-50">
         <BrowserRouter>
-          <Header />
+          <Header token={token} />
           <Switch>
             <Route path="/" exact>
               <Home />
             </Route>
 
             <Route path="/login">
-              {!user ? (
+              {!token ? (
                 <Login
                   email={email}
                   password={password}
@@ -154,7 +154,7 @@ class App extends React.Component {
             </Route>
 
             <Route path="/signup">
-              {!user ? (
+              {!token ? (
                 <Singup
                   email={email}
                   password={password}
