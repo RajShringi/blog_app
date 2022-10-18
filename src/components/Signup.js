@@ -37,10 +37,7 @@ class Singup extends React.Component {
 
         {Object.keys(serverError).map((error) => {
           return (
-            <p
-              key={error}
-              className="inline-block text-red-400 font-medium text-sm"
-            >
+            <p key={error} className="text-red-400 font-medium text-sm">
               {error} {serverError[error]}
             </p>
           );
