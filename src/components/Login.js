@@ -1,11 +1,31 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+import validate from "../utils/validate";
 
 class Login extends React.Component {
-  render() {
-    const { email, password, emailError, passwordError, handleChange } =
-      this.props;
+  state = {
+    email: "",
+    password: "",
 
+    errors: {
+      email: "",
+      password: "",
+    },
+  };
+
+  handleChange = ({ target }) => {
+    const { name, value } = target;
+    const errors = this.state.errors;
+    validate(name, value, errors);
+    this.setState({
+      [name]: value,
+      errors,
+    });
+  };
+
+  render() {
+    const { email, password, handleChange } = this.state;
+    const { email: emailError, password: passwordError } = this.state.errors;
     return (
       <form
         className="bg-white p-4 max-w-xl mx-auto my-4 shadow-sm rounded-lg"
@@ -28,7 +48,7 @@ class Login extends React.Component {
             placeholder="Email"
             name="email"
             value={email}
-            onChange={handleChange}
+            onChange={this.handleChange}
           />
           <span className="inline-block text-red-400 font-medium text-sm">
             {emailError}
@@ -43,7 +63,7 @@ class Login extends React.Component {
             placeholder="Password"
             name="password"
             value={password}
-            onChange={handleChange}
+            onChange={this.handleChange}
           />
           <span className="inline-block text-red-400 font-medium text-sm">
             {passwordError}

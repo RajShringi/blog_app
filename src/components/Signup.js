@@ -1,23 +1,39 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+import validate from "../utils/validate";
 
 class Singup extends React.Component {
+  state = {
+    email: "",
+    password: "",
+    username: "",
+    errors: {
+      email: "",
+      password: "",
+      username: "",
+    },
+  };
+
+  handleChange = ({ target }) => {
+    const { name, value } = target;
+    const errors = this.state.errors;
+    validate(name, value, errors);
+    this.setState({
+      [name]: value,
+      errors,
+    });
+  };
+
   render() {
+    const { email, password, username } = this.state;
     const {
-      email,
-      password,
-      username,
-      emailError,
-      passwordError,
-      usernameError,
-      handleChange,
-    } = this.props;
+      email: emailError,
+      password: passwordError,
+      username: usernameError,
+    } = this.state.errors;
 
     return (
-      <form
-        className="bg-white p-4 max-w-xl mx-auto my-4 shadow-sm rounded-lg"
-        onSubmit={this.handleSubmit}
-      >
+      <form className="bg-white p-4 max-w-xl mx-auto my-4 shadow-sm rounded-lg">
         <div className="my-4 text-center">
           <h1 className="text-4xl font-medium mb-2">Sign Up</h1>
           <NavLink to="/login">
@@ -35,7 +51,7 @@ class Singup extends React.Component {
             placeholder="Username"
             name="username"
             value={username}
-            onChange={handleChange}
+            onChange={this.handleChange}
           />
           <span className="inline-block text-red-400 font-medium text-sm">
             {usernameError}
@@ -50,7 +66,7 @@ class Singup extends React.Component {
             placeholder="Email"
             name="email"
             value={email}
-            onChange={handleChange}
+            onChange={this.handleChange}
           />
           <span className="inline-block text-red-400 font-medium text-sm">
             {emailError}
@@ -65,7 +81,7 @@ class Singup extends React.Component {
             placeholder="Password"
             name="password"
             value={password}
-            onChange={handleChange}
+            onChange={this.handleChange}
           />
           <span className="inline-block text-red-400 font-medium text-sm">
             {passwordError}
@@ -74,7 +90,7 @@ class Singup extends React.Component {
 
         <div className="flex justify-center my-4">
           <button className="py-2 px-6 bg-indigo-400 text-white rounded-lg hover:bg-indigo-500">
-            Sign in
+            Sign up
           </button>
         </div>
       </form>
