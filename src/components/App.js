@@ -133,7 +133,7 @@ class App extends React.Component {
           <Header token={token} />
           <Switch>
             <Route path="/" exact>
-              <Home />
+              <Home token={token} />
             </Route>
 
             <Route path="/login">
