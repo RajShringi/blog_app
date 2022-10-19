@@ -81,7 +81,7 @@ class Home extends React.Component {
         data = await myfetch(`${articleURL}?limit=${limit}&offset=${offset}`);
         break;
       case "myfeed":
-        const res = await fetch(
+        data = await myfetch(
           `${articleURL}/feed?limit=${limit}&offset=${offset}`,
           {
             headers: {
@@ -89,7 +89,6 @@ class Home extends React.Component {
             },
           }
         );
-        data = await res.json();
         break;
       default:
         let newTag = tag.replace(/#/gi, "%23");
