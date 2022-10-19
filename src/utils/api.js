@@ -1,5 +1,5 @@
-async function myfetch(url) {
-  const res = await fetch(url);
+async function myfetch(url, options = {}) {
+  const res = await fetch(url, options);
   if (!res.ok) {
     throw new Error(res.statusText);
   }
