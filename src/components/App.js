@@ -25,6 +25,14 @@ class App extends React.Component {
     },
   };
 
+  componentDidMount = () => {
+    if (localStorage.token) {
+      this.setState({
+        token: JSON.parse(localStorage.token),
+      });
+    }
+  };
+
   handleChange = ({ target }) => {
     const { name, value } = target;
     const errors = this.state.errors;

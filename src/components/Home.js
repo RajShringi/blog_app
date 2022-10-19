@@ -22,12 +22,33 @@ class Home extends React.Component {
     try {
       const limit = this.state.articlesPerPage;
       const offset = (this.state.activePageIndex - 1) * limit;
-      const { articles, articlesCount } = await myfetch(
-        `${articleURL}?limit=${limit}&offset=${offset}`
-      );
+      let token = "";
+      if (localStorage.token) {
+        token = JSON.parse(localStorage.getItem("token")) || "";
+      }
+      let data, tag;
+      if (token) {
+        this.setState({
+          userSelectedTag: "myfeed",
+        });
+        data = await myfetch(
+          `${articleURL}/feed?limit=${limit}&offset=${offset}`,
+          {
+            headers: {
+              Authorization: `Token ${token}`,
+            },
+          }
+        );
+        tag = "myfeed";
+      } else {
+        data = await myfetch(`${articleURL}?limit=${limit}&offset=${offset}`);
+        tag = null;
+      }
+
       this.setState({
-        articles,
-        articlesCount,
+        articles: data.articles,
+        articlesCount: data.articlesCount,
+        userSelectedTag: tag,
       });
     } catch (err) {
       this.setState({
