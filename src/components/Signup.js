@@ -1,29 +1,76 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import Loader from "./Loader";
+import validate from "../utils/validate";
+import { singupURL } from "../utils/constant";
+import { withRouter } from "react-router";
 
 class Singup extends React.Component {
-  render() {
-    const {
-      email,
-      password,
-      username,
-      emailError,
-      passwordError,
-      usernameError,
-      handleChange,
-      handleSignup,
-      isLoading,
-      serverError,
-    } = this.props;
+  state = {
+    email: "",
+    password: "",
+    username: "",
+    errors: {
+      email: "",
+      password: "",
+      username: "",
+    },
+  };
 
-    if (isLoading) {
-      return <Loader />;
+  handleChange = ({ target }) => {
+    const { name, value } = target;
+    const errors = this.state.errors;
+    validate(name, value, errors);
+    this.setState({
+      [name]: value,
+      errors,
+    });
+  };
+
+  handleSubmit = async (e) => {
+    e.preventDefault();
+    const { username, email, password } = this.state;
+    try {
+      const res = await fetch(singupURL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user: {
+            username,
+            email,
+            password,
+          },
+        }),
+      });
+
+      if (!res.ok) {
+        const { errors } = await res.json();
+        throw errors;
+      }
+
+      const { user } = await res.json();
+      this.props.updateUser(user);
+      this.props.history.push("/");
+    } catch (errors) {
+      console.log(errors);
+      this.setState({
+        errors,
+      });
     }
+  };
+
+  render() {
+    const { email, password, username, serverError } = this.state;
+    const {
+      email: emailError,
+      password: passwordError,
+      username: usernameError,
+    } = this.state.errors;
 
     return (
       <form
-        onSubmit={handleSignup}
+        onSubmit={this.handleSubmit}
         className="bg-white p-4 max-w-xl mx-auto my-4 shadow-sm rounded-lg"
       >
         <div className="my-4 text-center">
@@ -35,14 +82,6 @@ class Singup extends React.Component {
           </NavLink>
         </div>
 
-        {Object.keys(serverError).map((error) => {
-          return (
-            <p key={error} className="text-red-400 font-medium text-sm">
-              {error} {serverError[error]}
-            </p>
-          );
-        })}
-
         <div className="my-4">
           <label className="text-sm text-gray-600 font-medium">Username</label>
           <input
@@ -51,7 +90,7 @@ class Singup extends React.Component {
             placeholder="Username"
             name="username"
             value={username}
-            onChange={handleChange}
+            onChange={this.handleChange}
           />
           <span className="inline-block text-red-400 font-medium text-sm">
             {usernameError}
@@ -66,7 +105,7 @@ class Singup extends React.Component {
             placeholder="Email"
             name="email"
             value={email}
-            onChange={handleChange}
+            onChange={this.handleChange}
           />
           <span className="inline-block text-red-400 font-medium text-sm">
             {emailError}
@@ -81,7 +120,7 @@ class Singup extends React.Component {
             placeholder="Password"
             name="password"
             value={password}
-            onChange={handleChange}
+            onChange={this.handleChange}
           />
           <span className="inline-block text-red-400 font-medium text-sm">
             {passwordError}
@@ -97,4 +136,4 @@ class Singup extends React.Component {
     );
   }
 }
-export default Singup;
+export default withRouter(Singup);
