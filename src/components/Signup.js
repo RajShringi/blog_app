@@ -61,7 +61,7 @@ class Singup extends React.Component {
   };
 
   render() {
-    const { email, password, username, serverError } = this.state;
+    const { email, password, username } = this.state;
     const {
       email: emailError,
       password: passwordError,
