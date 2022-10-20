@@ -1,8 +1,10 @@
 import React from "react";
-import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
+import { Route, Switch } from "react-router-dom";
+import { localStorageKey, userVerify } from "../utils/constant";
 import Header from "./Header";
 import Home from "./Home";
 import IndividualArticle from "./IndividualArticle";
+import Loader from "./Loader";
 import Login from "./Login";
 import NoMatch from "./NoMatch";
 import Singup from "./Signup";
@@ -11,41 +13,100 @@ class App extends React.Component {
   state = {
     isLoggedIn: false,
     user: null,
+    isVerifying: true,
+  };
+
+  componentDidMount = async () => {
+    const key = localStorage[localStorageKey];
+    if (key) {
+      try {
+        const res = await fetch(userVerify, {
+          method: "GET",
+          headers: {
+            authorization: `Token ${key}`,
+          },
+        });
+        if (!res.ok) {
+          const { errors } = await res.json();
+          throw errors;
+        }
+        const { user } = await res.json();
+        this.updateUser(user);
+      } catch (errors) {
+        console.log(errors);
+      }
+    } else {
+      this.setState({
+        isVerifying: false,
+      });
+    }
   };
 
   updateUser = (user) => {
     this.setState({
       isLoggedIn: true,
       user,
+      isVerifying: false,
     });
+    localStorage.setItem(localStorageKey, user.token);
   };
 
   render() {
-    const { isLoggedIn, user } = this.state;
+    const { isLoggedIn, user, isVerifying } = this.state;
+    if (isVerifying) {
+      return <Loader />;
+    }
     return (
       <div className="h-screen overflow-y-scroll text-gray-700 bg-gray-50">
         <Header isLoggedIn={isLoggedIn} user={user} />
-        <Switch>
-          <Route path="/" exact>
-            <Home />
-          </Route>
-
-          <Route path="/login">
-            <Login updateUser={this.updateUser} />
-          </Route>
-
-          <Route path="/signup">
-            <Singup updateUser={this.updateUser} />
-          </Route>
-
-          <Route path="/article/:slug" component={IndividualArticle} />
-
-          <Route path="*">
-            <NoMatch />
-          </Route>
-        </Switch>
+        {isLoggedIn ? (
+          <AuthenticateApp />
+        ) : (
+          <UnauthenticateApp updateUser={this.updateUser} />
+        )}
       </div>
     );
   }
 }
+
+function AuthenticateApp() {
+  return (
+    <Switch>
+      <Route path="/" exact>
+        <Home />
+      </Route>
+
+      <Route path="/article/:slug" component={IndividualArticle} />
+
+      <Route path="*">
+        <NoMatch />
+      </Route>
+    </Switch>
+  );
+}
+
+function UnauthenticateApp(props) {
+  return (
+    <Switch>
+      <Route path="/" exact>
+        <Home />
+      </Route>
+
+      <Route path="/login">
+        <Login updateUser={props.updateUser} />
+      </Route>
+
+      <Route path="/signup">
+        <Singup updateUser={props.updateUser} />
+      </Route>
+
+      <Route path="/article/:slug" component={IndividualArticle} />
+
+      <Route path="*">
+        <NoMatch />
+      </Route>
+    </Switch>
+  );
+}
+
 export default App;
