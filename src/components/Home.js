@@ -3,7 +3,7 @@ import Loader from "./Loader";
 import Tags from "./Tags";
 import { myfetch } from "../utils/api";
 import Articles from "./Articles";
-import { articleURL } from "../utils/constant";
+import { articleURL, feedURL } from "../utils/constant";
 
 class Home extends React.Component {
   constructor(props) {
@@ -15,6 +15,7 @@ class Home extends React.Component {
       activePageIndex: 1,
       error: null,
       articlesPerPage: 10,
+      isVerifying: true,
     };
   }
 
@@ -22,37 +23,31 @@ class Home extends React.Component {
     try {
       const limit = this.state.articlesPerPage;
       const offset = (this.state.activePageIndex - 1) * limit;
-      let token = "";
-      if (localStorage.token) {
-        token = JSON.parse(localStorage.getItem("token")) || "";
-      }
-      let data, tag;
-      if (token) {
-        this.setState({
-          userSelectedTag: "myfeed",
-        });
-        data = await myfetch(
-          `${articleURL}/feed?limit=${limit}&offset=${offset}`,
-          {
-            headers: {
-              Authorization: `Token ${token}`,
-            },
-          }
-        );
-        tag = "myfeed";
-      } else {
+      let data, userSelectedTag;
+      if (!this.props.isLoggedIn) {
         data = await myfetch(`${articleURL}?limit=${limit}&offset=${offset}`);
-        tag = null;
+        userSelectedTag = null;
+      } else {
+        data = await myfetch(`${feedURL}?limit=${limit}&offset=${offset}`, {
+          method: "GET",
+          headers: {
+            authorization: `Token ${this.props.user.token}`,
+          },
+        });
+        userSelectedTag = "myfeed";
       }
 
+      const { articles, articlesCount } = data;
       this.setState({
-        articles: data.articles,
-        articlesCount: data.articlesCount,
-        userSelectedTag: tag,
+        articles,
+        articlesCount,
+        userSelectedTag,
+        isVerifying: false,
       });
     } catch (err) {
       this.setState({
         error: err.message,
+        isVerifying: false,
       });
     }
   }
@@ -92,7 +87,6 @@ class Home extends React.Component {
       articles: null,
     });
 
-    const { token } = this.props;
     const limit = this.state.articlesPerPage;
     const offset = (this.state.activePageIndex - 1) * 10;
     let articles, data, articlesCount;
@@ -102,14 +96,12 @@ class Home extends React.Component {
         data = await myfetch(`${articleURL}?limit=${limit}&offset=${offset}`);
         break;
       case "myfeed":
-        data = await myfetch(
-          `${articleURL}/feed?limit=${limit}&offset=${offset}`,
-          {
-            headers: {
-              Authorization: `Token ${token}`,
-            },
-          }
-        );
+        data = await myfetch(`${feedURL}?limit=${limit}&offset=${offset}`, {
+          method: "GET",
+          headers: {
+            authorization: `Token ${this.props.user.token}`,
+          },
+        });
         break;
       default:
         let newTag = tag.replace(/#/gi, "%23");
@@ -130,9 +122,15 @@ class Home extends React.Component {
   };
 
   render() {
-    const { articles, articlesCount, activePageIndex, userSelectedTag, error } =
-      this.state;
-    const { token } = this.props;
+    const {
+      articles,
+      articlesCount,
+      activePageIndex,
+      userSelectedTag,
+      error,
+      isVerifying,
+    } = this.state;
+    const { isLoggedIn } = this.props;
     const pages = [];
     for (let i = 1; i <= Math.ceil(articlesCount / 10); i++) {
       pages.push(i);
@@ -144,6 +142,10 @@ class Home extends React.Component {
           Couldn't fetch the articles
         </p>
       );
+    }
+
+    if (isVerifying) {
+      return <Loader />;
     }
 
     return (
@@ -162,7 +164,7 @@ class Home extends React.Component {
           <div className="w-[60%]">
             <nav>
               <ul className="flex itmes-center space-x-4 border-b-4 border-gray-100 mb-4 p-2">
-                {token && (
+                {isLoggedIn && (
                   <li
                     className={`p-2 cursor-pointer ${
                       userSelectedTag === "myfeed"

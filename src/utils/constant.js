@@ -4,6 +4,7 @@ const singupURL = ROOT_URL + "/users";
 const loginURL = ROOT_URL + "/users/login";
 const localStorageKey = "app_user";
 const userVerify = ROOT_URL + "/user";
+const feedURL = articleURL + "/feed";
 
 export {
   ROOT_URL,
@@ -12,4 +13,5 @@ export {
   loginURL,
   localStorageKey,
   userVerify,
+  feedURL,
 };

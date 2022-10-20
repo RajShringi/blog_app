@@ -60,20 +60,23 @@ class App extends React.Component {
       <div className="h-screen overflow-y-scroll text-gray-700 bg-gray-50">
         <Header isLoggedIn={isLoggedIn} user={user} />
         {isLoggedIn ? (
-          <AuthenticateApp />
+          <AuthenticateApp isLoggedIn={isLoggedIn} user={user} />
         ) : (
-          <UnauthenticateApp updateUser={this.updateUser} />
+          <UnauthenticateApp
+            isLoggedIn={isLoggedIn}
+            updateUser={this.updateUser}
+          />
         )}
       </div>
     );
   }
 }
 
-function AuthenticateApp() {
+function AuthenticateApp(props) {
   return (
     <Switch>
       <Route path="/" exact>
-        <Home />
+        <Home isLoggedIn={props.isLoggedIn} user={props.user} />
       </Route>
 
       <Route path="/article/:slug" component={IndividualArticle} />
@@ -89,7 +92,7 @@ function UnauthenticateApp(props) {
   return (
     <Switch>
       <Route path="/" exact>
-        <Home />
+        <Home isLoggedIn={props.isLoggedIn} user={props.user} />
       </Route>
 
       <Route path="/login">
