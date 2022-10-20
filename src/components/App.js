@@ -21,9 +21,10 @@ class App extends React.Component {
   };
 
   render() {
+    const { isLoggedIn, user } = this.state;
     return (
       <div className="h-screen overflow-y-scroll text-gray-700 bg-gray-50">
-        <Header />
+        <Header isLoggedIn={isLoggedIn} user={user} />
         <Switch>
           <Route path="/" exact>
             <Home />
