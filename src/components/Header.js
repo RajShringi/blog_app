@@ -1,8 +1,9 @@
 import { NavLink } from "react-router-dom";
+import { MdOutlineLibraryAdd, MdSettings, MdHome } from "react-icons/md";
 
-function Header() {
+function Header({ isLoggedIn, user }) {
   return (
-    <div className="py-4 shadow-sm bg-white">
+    <div className="py-4 shadow-sm bg-white box-border">
       <header className="container mx-auto">
         <nav className="flex justify-between items-center">
           <NavLink exact to="/">
@@ -10,26 +11,69 @@ function Header() {
               Conduit
             </h3>
           </NavLink>
-          <ul className="flex justify-between items-center">
-            <NavLink exact to="/" activeClassName="text-indigo-400">
-              <li className="mx-6 p-2 cursor-pointer hover:text-indigo-400">
-                Home
-              </li>
-            </NavLink>
-            <NavLink to="/login" activeClassName="text-indigo-400">
-              <li className="mx-6 p-2 cursor-pointer hover:text-indigo-400">
-                Sign in
-              </li>
-            </NavLink>
-            <NavLink to="/signup" activeClassName="text-indigo-400">
-              <li className="mx-6 p-2 cursor-pointer hover:text-indigo-400">
-                Sign up
-              </li>
-            </NavLink>
-          </ul>
+          {isLoggedIn ? <AuthHeader /> : <NonAuthHeader />}
         </nav>
       </header>
     </div>
   );
 }
+
+function AuthHeader() {
+  return (
+    <ul className="flex justify-between items-center">
+      <NavLink exact to="/" activeClassName="text-indigo-400">
+        <li className="mx-6 p-2 cursor-pointer border-b-2 border-transparent hover:border-indigo-400 flex items-center space-x-2">
+          <MdHome className="text-2xl" />
+          <span>Home</span>
+        </li>
+      </NavLink>
+
+      <NavLink exact to="*" activeClassName="text-indigo-400">
+        <li className="mx-6 p-2 cursor-pointer border-b-2 border-transparent hover:border-indigo-400 flex items-center space-x-2">
+          <MdOutlineLibraryAdd className="text-2xl" />
+          <span>New Post</span>
+        </li>
+      </NavLink>
+
+      <NavLink exact to="*" activeClassName="text-indigo-400">
+        <li className="mx-6 p-2 cursor-pointer border-b-2 border-transparent hover:border-indigo-400 flex items-center space-x-2">
+          <MdSettings className="text-2xl" />
+          <span>Settings</span>
+        </li>
+      </NavLink>
+
+      <NavLink exact to="*" activeClassName="text-indigo-400">
+        <li className="mx-6 p-2 cursor-pointer border-b-2 border-transparent hover:border-indigo-400">
+          Profile
+        </li>
+      </NavLink>
+    </ul>
+  );
+}
+
+function NonAuthHeader() {
+  return (
+    <ul className="flex justify-between items-center">
+      <NavLink exact to="/" activeClassName="text-indigo-400">
+        <li className="mx-6 p-2 cursor-pointer border-b-2 border-transparent hover:border-indigo-400 flex items-center space-x-2">
+          <MdHome className="text-2xl" />
+          <span>Home</span>
+        </li>
+      </NavLink>
+
+      <NavLink to="/login" activeClassName="text-indigo-400">
+        <li className="mx-6 p-2 cursor-pointer border-b-2 border-transparent hover:border-indigo-400">
+          Sign in
+        </li>
+      </NavLink>
+
+      <NavLink to="/signup" activeClassName="text-indigo-400">
+        <li className="mx-6 p-2 cursor-pointer border-b-2 border-transparent hover:border-indigo-400">
+          Sign up
+        </li>
+      </NavLink>
+    </ul>
+  );
+}
+
 export default Header;

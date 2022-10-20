@@ -1,15 +1,75 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+import validate from "../utils/validate";
+import { loginURL } from "../utils/constant";
+import { withRouter } from "react-router";
 
 class Login extends React.Component {
+  state = {
+    email: "",
+    password: "",
+    username: "",
+    errors: {
+      email: "",
+      password: "",
+      username: "",
+    },
+  };
+
+  handleChange = ({ target }) => {
+    const { name, value } = target;
+    const errors = this.state.errors;
+    validate(name, value, errors);
+    this.setState({
+      [name]: value,
+      errors,
+    });
+  };
+
+  handleSubmit = async (e) => {
+    e.preventDefault();
+    const { email, password } = this.state;
+    try {
+      const res = await fetch(loginURL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user: {
+            email,
+            password,
+          },
+        }),
+      });
+      if (!res.ok) {
+        const { errors } = await res.json();
+        throw errors;
+      }
+      const { user } = await res.json();
+      this.props.updateUser(user);
+      this.props.history.push("/");
+    } catch (error) {
+      this.setState((prevState) => {
+        return {
+          ...prevState,
+          errors: {
+            ...prevState.errors,
+            email: "Email or Password is incorrect",
+          },
+        };
+      });
+    }
+  };
+
   render() {
-    const { email, password, emailError, passwordError, handleChange } =
-      this.props;
+    const { email, password } = this.state;
+    const { email: emailError, password: passwordError } = this.state.errors;
 
     return (
       <form
-        className="bg-white p-4 max-w-xl mx-auto my-4 shadow-sm rounded-lg"
         onSubmit={this.handleSubmit}
+        className="bg-white p-4 max-w-xl mx-auto my-4 shadow-sm rounded-lg"
       >
         <div className="my-4 text-center">
           <h1 className="text-4xl font-medium mb-2">Sign In</h1>
@@ -28,7 +88,7 @@ class Login extends React.Component {
             placeholder="Email"
             name="email"
             value={email}
-            onChange={handleChange}
+            onChange={this.handleChange}
           />
           <span className="inline-block text-red-400 font-medium text-sm">
             {emailError}
@@ -43,7 +103,7 @@ class Login extends React.Component {
             placeholder="Password"
             name="password"
             value={password}
-            onChange={handleChange}
+            onChange={this.handleChange}
           />
           <span className="inline-block text-red-400 font-medium text-sm">
             {passwordError}
@@ -60,4 +120,4 @@ class Login extends React.Component {
   }
 }
 
-export default Login;
+export default withRouter(Login);

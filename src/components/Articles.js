@@ -1,6 +1,12 @@
 import Article from "./Article";
 
 function Articles({ articles, pages, activePageIndex, handleFetchPagination }) {
+  if (articles.length < 1) {
+    return (
+      <h2 className="text-center font-bold text-4xl">No Articles Found</h2>
+    );
+  }
+
   return (
     <div>
       {/* Articles */}

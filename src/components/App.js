@@ -1,100 +1,115 @@
 import React from "react";
-import { BrowserRouter, Route, Switch } from "react-router-dom";
+import { Route, Switch } from "react-router-dom";
+import { localStorageKey, userVerify } from "../utils/constant";
 import Header from "./Header";
 import Home from "./Home";
 import IndividualArticle from "./IndividualArticle";
+import Loader from "./Loader";
 import Login from "./Login";
 import NoMatch from "./NoMatch";
 import Singup from "./Signup";
 
 class App extends React.Component {
-  constructor(props) {
-    super();
-    this.state = {
-      email: "",
-      password: "",
-      username: "",
-      errors: {
-        email: "",
-        password: "",
-        username: "",
-      },
-    };
-  }
-
-  validatePassword = (password) => {
-    const re = /^(?=.*[a-zA-Z])(?=.*[0-9])/;
-    return re.test(password);
+  state = {
+    isLoggedIn: false,
+    user: null,
+    isVerifying: true,
   };
 
-  handleChange = ({ target }) => {
-    const { name, value } = target;
-    const errors = this.state.errors;
-    if (value === "") {
-      errors[name] = `${[name]} can't be empty.`;
-    } else if (name === "password" && !this.validatePassword(value)) {
-      errors[name] = "Password must contain a letter and a number";
-    } else if (name === "password" && value.length < 6) {
-      errors[name] = "Password should be at-least 6 characters";
-    } else if (name === "email" && !value.includes("@")) {
-      errors[name] = "Email should contain @ ";
-    } else if (name === "username" && value.length < 6) {
-      errors[name] = "Username should be at-least 6 characters long";
+  componentDidMount = async () => {
+    const key = localStorage[localStorageKey];
+    if (key) {
+      try {
+        const res = await fetch(userVerify, {
+          method: "GET",
+          headers: {
+            authorization: `Token ${key}`,
+          },
+        });
+        if (!res.ok) {
+          const { errors } = await res.json();
+          throw errors;
+        }
+        const { user } = await res.json();
+        this.updateUser(user);
+      } catch (errors) {
+        console.log(errors);
+      }
     } else {
-      errors[name] = "";
+      this.setState({
+        isVerifying: false,
+      });
     }
+  };
+
+  updateUser = (user) => {
     this.setState({
-      [name]: value,
-      errors,
+      isLoggedIn: true,
+      user,
+      isVerifying: false,
     });
+    localStorage.setItem(localStorageKey, user.token);
   };
 
   render() {
-    const { email, password, username } = this.state;
-    const {
-      email: emailError,
-      password: passwordError,
-      username: usernameError,
-    } = this.state.errors;
-
+    const { isLoggedIn, user, isVerifying } = this.state;
+    if (isVerifying) {
+      return <Loader />;
+    }
     return (
       <div className="h-screen overflow-y-scroll text-gray-700 bg-gray-50">
-        <BrowserRouter>
-          <Header />
-          <Switch>
-            <Route path="/" exact>
-              <Home />
-            </Route>
-
-            <Route path="/login">
-              <Login
-                email={email}
-                password={password}
-                emailError={emailError}
-                passwordError={passwordError}
-                handleChange={this.handleChange}
-              />
-            </Route>
-
-            <Route path="/signup">
-              <Singup
-                email={email}
-                password={password}
-                username={username}
-                emailError={emailError}
-                passwordError={passwordError}
-                usernameError={usernameError}
-                handleChange={this.handleChange}
-              />
-            </Route>
-
-            <Route path="/article/:slug" component={IndividualArticle} />
-            <NoMatch />
-            <Route path="*"></Route>
-          </Switch>
-        </BrowserRouter>
+        <Header isLoggedIn={isLoggedIn} user={user} />
+        {isLoggedIn ? (
+          <AuthenticateApp isLoggedIn={isLoggedIn} user={user} />
+        ) : (
+          <UnauthenticateApp
+            isLoggedIn={isLoggedIn}
+            updateUser={this.updateUser}
+          />
+        )}
       </div>
     );
   }
 }
+
+function AuthenticateApp(props) {
+  return (
+    <Switch>
+      <Route path="/" exact>
+        <Home isLoggedIn={props.isLoggedIn} user={props.user} />
+      </Route>
+
+      <Route path="/article/:slug" component={IndividualArticle} />
+
+      <Route path="*">
+        <NoMatch />
+      </Route>
+    </Switch>
+  );
+}
+
+function UnauthenticateApp(props) {
+  return (
+    <Switch>
+      <Route path="/" exact>
+        <Home isLoggedIn={props.isLoggedIn} user={props.user} />
+      </Route>
+
+      <Route path="/login">
+        <Login updateUser={props.updateUser} />
+      </Route>
+
+      <Route path="/signup">
+        <Singup updateUser={props.updateUser} />
+      </Route>
+
+      <Route path="/article/:slug" component={IndividualArticle} />
+
+      <Route path="*">
+        <NoMatch />
+      </Route>
+    </Switch>
+  );
+}
+
 export default App;

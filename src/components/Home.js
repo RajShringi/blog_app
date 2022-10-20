@@ -3,7 +3,7 @@ import Loader from "./Loader";
 import Tags from "./Tags";
 import { myfetch } from "../utils/api";
 import Articles from "./Articles";
-import { articleURL } from "../utils/constant";
+import { articleURL, feedURL } from "../utils/constant";
 
 class Home extends React.Component {
   constructor(props) {
@@ -15,24 +15,39 @@ class Home extends React.Component {
       activePageIndex: 1,
       error: null,
       articlesPerPage: 10,
+      isVerifying: true,
     };
   }
 
   async componentDidMount() {
     try {
       const limit = this.state.articlesPerPage;
-      const { articles, articlesCount } = await myfetch(
-        `${articleURL}?limit=${limit}&offset=${
-          (this.state.activePageIndex - 1) * limit
-        }`
-      );
+      const offset = (this.state.activePageIndex - 1) * limit;
+      let data, userSelectedTag;
+      if (!this.props.isLoggedIn) {
+        data = await myfetch(`${articleURL}?limit=${limit}&offset=${offset}`);
+        userSelectedTag = null;
+      } else {
+        data = await myfetch(`${feedURL}?limit=${limit}&offset=${offset}`, {
+          method: "GET",
+          headers: {
+            authorization: `Token ${this.props.user.token}`,
+          },
+        });
+        userSelectedTag = "myfeed";
+      }
+
+      const { articles, articlesCount } = data;
       this.setState({
         articles,
         articlesCount,
+        userSelectedTag,
+        isVerifying: false,
       });
     } catch (err) {
       this.setState({
         error: err.message,
+        isVerifying: false,
       });
     }
   }
@@ -46,6 +61,7 @@ class Home extends React.Component {
     let articles, data;
     const limit = this.state.articlesPerPage;
     const offset = (activePageIndex - 1) * 10;
+
     try {
       if (userSelectedTag === null) {
         data = await myfetch(`${articleURL}?limit=${limit}&offset=${offset}`);
@@ -70,13 +86,31 @@ class Home extends React.Component {
     this.setState({
       articles: null,
     });
+
+    const limit = this.state.articlesPerPage;
+    const offset = (this.state.activePageIndex - 1) * 10;
     let articles, data, articlesCount;
-    if (tag === null) {
-      data = await myfetch(`${articleURL}?limit=10&offset=0`);
-    } else {
-      let newTag = tag.replace(/#/gi, "%23");
-      data = await myfetch(`${articleURL}?tag=${newTag}&limit=10&offset=0`);
+
+    switch (tag) {
+      case null:
+        data = await myfetch(`${articleURL}?limit=${limit}&offset=${offset}`);
+        break;
+      case "myfeed":
+        data = await myfetch(`${feedURL}?limit=${limit}&offset=${offset}`, {
+          method: "GET",
+          headers: {
+            authorization: `Token ${this.props.user.token}`,
+          },
+        });
+        break;
+      default:
+        let newTag = tag.replace(/#/gi, "%23");
+        data = await myfetch(
+          `${articleURL}?tag=${newTag}&limit=${limit}&offset=${offset}`
+        );
+        break;
     }
+
     articles = data.articles;
     articlesCount = data.articlesCount;
     this.setState({
@@ -88,8 +122,15 @@ class Home extends React.Component {
   };
 
   render() {
-    const { articles, articlesCount, activePageIndex, userSelectedTag, error } =
-      this.state;
+    const {
+      articles,
+      articlesCount,
+      activePageIndex,
+      userSelectedTag,
+      error,
+      isVerifying,
+    } = this.state;
+    const { isLoggedIn } = this.props;
     const pages = [];
     for (let i = 1; i <= Math.ceil(articlesCount / 10); i++) {
       pages.push(i);
@@ -101,6 +142,10 @@ class Home extends React.Component {
           Couldn't fetch the articles
         </p>
       );
+    }
+
+    if (isVerifying) {
+      return <Loader />;
     }
 
     return (
@@ -119,6 +164,19 @@ class Home extends React.Component {
           <div className="w-[60%]">
             <nav>
               <ul className="flex itmes-center space-x-4 border-b-4 border-gray-100 mb-4 p-2">
+                {isLoggedIn && (
+                  <li
+                    className={`p-2 cursor-pointer ${
+                      userSelectedTag === "myfeed"
+                        ? "bg-indigo-400 text-white"
+                        : "bg-gray-100"
+                    }`}
+                    onClick={() => this.handleClickTag("myfeed")}
+                  >
+                    Your Feed
+                  </li>
+                )}
+
                 <li
                   className={`p-2 cursor-pointer ${
                     userSelectedTag === null
@@ -129,9 +187,10 @@ class Home extends React.Component {
                 >
                   Global Feed
                 </li>
-                <li className="text-indigo-400 p-2">
-                  {userSelectedTag && `#${userSelectedTag}`}
-                </li>
+
+                {userSelectedTag && userSelectedTag !== "myfeed" && (
+                  <li className="text-indigo-400 p-2"># {userSelectedTag}</li>
+                )}
               </ul>
             </nav>
 
