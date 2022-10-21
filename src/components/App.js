@@ -81,7 +81,7 @@ function AuthenticateApp(props) {
       </Route>
 
       <Route path="/new_post">
-        <NewPost />
+        <NewPost user={props.user} />
       </Route>
 
       <Route path="/article/:slug" component={IndividualArticle} />

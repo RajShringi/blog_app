@@ -1,4 +1,7 @@
 import React from "react";
+import { articleURL } from "../utils/constant";
+import { withRouter } from "react-router";
+
 class NewPost extends React.Component {
   state = {
     title: "",
@@ -27,6 +30,53 @@ class NewPost extends React.Component {
     });
   };
 
+  handleSubmit = async (e) => {
+    e.preventDefault();
+    const { title, description, body, tags } = this.state;
+
+    try {
+      if (!title || !description || !body || !tags) {
+        throw new Error("Fields can't be empty");
+      }
+      const res = await fetch(articleURL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Token ${this.props.user.token}`,
+        },
+        body: JSON.stringify({
+          article: {
+            title,
+            description,
+            body,
+            tagList: [...tags.split(",")],
+          },
+        }),
+      });
+      if (!res.ok) {
+        const { errors } = await res.json();
+        throw errors;
+      }
+
+      const { article } = await res.json();
+      console.log(article);
+      this.props.history.push(`/article/${article.slug}`);
+    } catch (errors) {
+      if (errors.message === "Fields can't be empty") {
+        this.setState((prevState) => {
+          return {
+            ...prevState,
+            errors: {
+              ...prevState.errors,
+              title: "Fill All the fields",
+            },
+          };
+        });
+      }
+      console.dir(errors);
+    }
+  };
+
   render() {
     const { title, description, body, tags } = this.state;
     const {
@@ -37,7 +87,10 @@ class NewPost extends React.Component {
     } = this.state.errors;
 
     return (
-      <form className="bg-white p-4 max-w-xl mx-auto my-4 shadow-sm rounded-lg">
+      <form
+        onSubmit={this.handleSubmit}
+        className="bg-white p-4 max-w-xl mx-auto my-4 shadow-sm rounded-lg"
+      >
         <div className="my-4 text-center">
           <h1 className="text-4xl font-medium mb-2">Add New Article</h1>
         </div>
@@ -114,4 +167,4 @@ class NewPost extends React.Component {
   }
 }
 
-export default NewPost;
+export default withRouter(NewPost);
