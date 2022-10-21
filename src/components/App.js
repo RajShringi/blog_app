@@ -6,6 +6,7 @@ import Home from "./Home";
 import IndividualArticle from "./IndividualArticle";
 import Loader from "./Loader";
 import Login from "./Login";
+import NewPost from "./NewPost";
 import NoMatch from "./NoMatch";
 import Singup from "./Signup";
 
@@ -77,6 +78,10 @@ function AuthenticateApp(props) {
     <Switch>
       <Route path="/" exact>
         <Home isLoggedIn={props.isLoggedIn} user={props.user} />
+      </Route>
+
+      <Route path="/new_post">
+        <NewPost />
       </Route>
 
       <Route path="/article/:slug" component={IndividualArticle} />
