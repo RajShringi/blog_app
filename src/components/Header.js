@@ -28,21 +28,21 @@ function AuthHeader() {
         </li>
       </NavLink>
 
-      <NavLink exact to="*" activeClassName="text-indigo-400">
+      <NavLink exact to="/new_post" activeClassName="text-indigo-400">
         <li className="mx-6 p-2 cursor-pointer border-b-2 border-transparent hover:border-indigo-400 flex items-center space-x-2">
           <MdOutlineLibraryAdd className="text-2xl" />
           <span>New Post</span>
         </li>
       </NavLink>
 
-      <NavLink exact to="*" activeClassName="text-indigo-400">
+      <NavLink exact to="/settings" activeClassName="text-indigo-400">
         <li className="mx-6 p-2 cursor-pointer border-b-2 border-transparent hover:border-indigo-400 flex items-center space-x-2">
           <MdSettings className="text-2xl" />
           <span>Settings</span>
         </li>
       </NavLink>
 
-      <NavLink exact to="*" activeClassName="text-indigo-400">
+      <NavLink exact to="/profile" activeClassName="text-indigo-400">
         <li className="mx-6 p-2 cursor-pointer border-b-2 border-transparent hover:border-indigo-400">
           Profile
         </li>
