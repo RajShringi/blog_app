@@ -8,6 +8,7 @@ import Loader from "./Loader";
 import Login from "./Login";
 import NewPost from "./NewPost";
 import NoMatch from "./NoMatch";
+import Settings from "./Settings";
 import Singup from "./Signup";
 
 class App extends React.Component {
@@ -82,6 +83,10 @@ function AuthenticateApp(props) {
 
       <Route path="/new_post">
         <NewPost user={props.user} />
+      </Route>
+
+      <Route path="/settings">
+        <Settings user={props.user} />
       </Route>
 
       <Route path="/article/:slug" component={IndividualArticle} />
