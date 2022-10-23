@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { MdOutlineLibraryAdd, MdSettings, MdHome } from "react-icons/md";
+import { CgProfile } from "react-icons/cg";
 
 function Header({ isLoggedIn, user }) {
   return (
@@ -43,8 +44,9 @@ function AuthHeader() {
       </NavLink>
 
       <NavLink exact to="/profile" activeClassName="text-indigo-400">
-        <li className="mx-6 p-2 cursor-pointer border-b-2 border-transparent hover:border-indigo-400">
-          Profile
+        <li className="mx-6 p-2 cursor-pointer border-b-2 border-transparent hover:border-indigo-400 flex items-center space-x-2">
+          <CgProfile className="text-2xl" />
+          <span>Profile</span>
         </li>
       </NavLink>
     </ul>
