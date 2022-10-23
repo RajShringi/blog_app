@@ -1,0 +1,154 @@
+import React from "react";
+import { userVerify } from "../utils/constant";
+import Loader from "./Loader";
+import { withRouter } from "react-router";
+
+class Settings extends React.Component {
+  state = {
+    image: this.props.user.image || "",
+    username: this.props.user.username || "",
+    bio: this.props.user.bio || "",
+    email: this.props.user.email || "",
+    password: "",
+    errors: {
+      email: "",
+    },
+  };
+
+  handleChagne = ({ target }) => {
+    const { name, value } = target;
+    const errors = this.state.errors;
+
+    switch (name) {
+      case "email":
+        errors[name] = value.includes("@") ? "" : "email should contain @";
+        break;
+    }
+
+    this.setState({
+      [name]: value,
+      errors,
+    });
+  };
+
+  handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const { image, username, bio, email, password } = this.state;
+      const res = await fetch(userVerify, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Token ${this.props.user.token}`,
+        },
+        body: JSON.stringify({
+          user: {
+            image,
+            username,
+            bio,
+            email,
+            password,
+          },
+        }),
+      });
+      if (!res.ok) {
+        const { errors } = await res.json();
+        throw errors;
+      }
+      const { user } = await res.json();
+      this.props.history.push("/");
+    } catch (errors) {
+      console.log(errors);
+    }
+  };
+
+  render() {
+    const { image, username, bio, email, password } = this.state;
+    const { email: emailError } = this.state.errors;
+
+    return (
+      <form
+        onSubmit={this.handleSubmit}
+        className="bg-white p-4 max-w-xl mx-auto my-4 shadow-sm rounded-lg"
+      >
+        <div className="my-4 text-center">
+          <h1 className="text-4xl font-medium mb-2">Settings</h1>
+        </div>
+
+        <div className="my-4">
+          <label className="text-sm text-gray-600 font-medium">
+            Profile Picture
+          </label>
+          <input
+            className="block w-full border p-2 shadow-inner rounded-lg"
+            type="text"
+            placeholder="URL of profile picture"
+            name="image"
+            value={image}
+            onChange={this.handleChagne}
+          />
+        </div>
+
+        <div className="my-4">
+          <label className="text-sm text-gray-600 font-medium">username</label>
+          <input
+            className="block w-full border p-2 shadow-inner rounded-lg"
+            type="text"
+            placeholder="Username"
+            name="username"
+            value={username}
+            onChange={this.handleChagne}
+          />
+        </div>
+
+        <div className="my-4">
+          <label className="text-sm text-gray-600 font-medium">bio</label>
+          <textarea
+            className="block w-full border p-2 shadow-inner rounded-lg"
+            placeholder="bio"
+            rows="5"
+            name="bio"
+            value={bio}
+            onChange={this.handleChagne}
+          ></textarea>
+        </div>
+
+        <div className="my-4">
+          <label className="text-sm text-gray-600 font-medium">Email</label>
+          <input
+            className="block w-full border p-2 shadow-inner rounded-lg"
+            type="email"
+            placeholder="Email"
+            name="email"
+            value={email}
+            onChange={this.handleChagne}
+          />
+          <span className="inline-block text-red-400 font-medium text-sm">
+            {emailError}
+          </span>
+        </div>
+
+        <div className="my-4">
+          <label className="text-sm text-gray-600 font-medium">
+            New Password
+          </label>
+          <input
+            className="block w-full border p-2 shadow-inner rounded-lg"
+            type="text"
+            placeholder="New Password"
+            name="password"
+            value={password}
+            onChange={this.handleChagne}
+          />
+        </div>
+
+        <div className="flex justify-center my-4">
+          <button className="py-2 px-6 bg-indigo-400 text-white rounded-lg hover:bg-indigo-500">
+            Update Settings
+          </button>
+        </div>
+      </form>
+    );
+  }
+}
+export default withRouter(Settings);
