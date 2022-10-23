@@ -59,7 +59,6 @@ class NewPost extends React.Component {
       }
 
       const { article } = await res.json();
-      console.log(article);
       this.props.history.push(`/article/${article.slug}`);
     } catch (errors) {
       if (errors.message === "Fields can't be empty") {
