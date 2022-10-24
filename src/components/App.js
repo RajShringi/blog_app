@@ -62,7 +62,11 @@ class App extends React.Component {
       <div className="h-screen overflow-y-scroll text-gray-700 bg-gray-50">
         <Header isLoggedIn={isLoggedIn} user={user} />
         {isLoggedIn ? (
-          <AuthenticateApp isLoggedIn={isLoggedIn} user={user} />
+          <AuthenticateApp
+            isLoggedIn={isLoggedIn}
+            user={user}
+            updateUser={this.updateUser}
+          />
         ) : (
           <UnauthenticateApp
             isLoggedIn={isLoggedIn}
@@ -86,7 +90,7 @@ function AuthenticateApp(props) {
       </Route>
 
       <Route path="/settings">
-        <Settings user={props.user} />
+        <Settings user={props.user} updateUser={props.updateUser} />
       </Route>
 
       <Route path="/article/:slug" component={IndividualArticle} />
