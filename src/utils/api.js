@@ -1,7 +1,8 @@
 async function myfetch(url, options = {}) {
   const res = await fetch(url, options);
   if (!res.ok) {
-    throw new Error(res.statusText);
+    const { errors } = await res.json();
+    throw errors;
   }
   const data = await res.json();
   return data;
