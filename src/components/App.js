@@ -8,6 +8,7 @@ import Loader from "./Loader";
 import Login from "./Login";
 import NewPost from "./NewPost";
 import NoMatch from "./NoMatch";
+import Profile from "./Profile";
 import Settings from "./Settings";
 import Singup from "./Signup";
 
@@ -92,6 +93,8 @@ function AuthenticateApp(props) {
       <Route path="/settings">
         <Settings user={props.user} updateUser={props.updateUser} />
       </Route>
+
+      <Route path="/profile/:username" component={Profile} />
 
       <Route path="/article/:slug" component={IndividualArticle} />
 
