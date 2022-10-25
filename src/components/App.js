@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Switch } from "react-router-dom";
+import { Route, Switch, withRouter } from "react-router-dom";
 import { localStorageKey, userVerify } from "../utils/constant";
 import Header from "./Header";
 import Home from "./Home";
@@ -54,6 +54,16 @@ class App extends React.Component {
     localStorage.setItem(localStorageKey, user.token);
   };
 
+  logout = () => {
+    localStorage.clear();
+    this.setState({
+      isLoggedIn: false,
+      user: null,
+      isVerifying: false,
+    });
+    this.props.history.push("/");
+  };
+
   render() {
     const { isLoggedIn, user, isVerifying } = this.state;
     if (isVerifying) {
@@ -61,7 +71,7 @@ class App extends React.Component {
     }
     return (
       <div className="h-screen overflow-y-scroll text-gray-700 bg-gray-50">
-        <Header isLoggedIn={isLoggedIn} user={user} />
+        <Header isLoggedIn={isLoggedIn} user={user} logout={this.logout} />
         {isLoggedIn ? (
           <AuthenticateApp
             isLoggedIn={isLoggedIn}
@@ -129,4 +139,4 @@ function UnauthenticateApp(props) {
   );
 }
 
-export default App;
+export default withRouter(App);
