@@ -1,12 +1,15 @@
 import React from "react";
-import { Route, Switch } from "react-router-dom";
+import { Route, Switch, withRouter } from "react-router-dom";
 import { localStorageKey, userVerify } from "../utils/constant";
 import Header from "./Header";
 import Home from "./Home";
 import IndividualArticle from "./IndividualArticle";
 import Loader from "./Loader";
 import Login from "./Login";
+import NewPost from "./NewPost";
 import NoMatch from "./NoMatch";
+import Profile from "./Profile";
+import Settings from "./Settings";
 import Singup from "./Signup";
 
 class App extends React.Component {
@@ -51,6 +54,16 @@ class App extends React.Component {
     localStorage.setItem(localStorageKey, user.token);
   };
 
+  logout = () => {
+    localStorage.clear();
+    this.setState({
+      isLoggedIn: false,
+      user: null,
+      isVerifying: false,
+    });
+    this.props.history.push("/");
+  };
+
   render() {
     const { isLoggedIn, user, isVerifying } = this.state;
     if (isVerifying) {
@@ -58,9 +71,13 @@ class App extends React.Component {
     }
     return (
       <div className="h-screen overflow-y-scroll text-gray-700 bg-gray-50">
-        <Header isLoggedIn={isLoggedIn} user={user} />
+        <Header isLoggedIn={isLoggedIn} user={user} logout={this.logout} />
         {isLoggedIn ? (
-          <AuthenticateApp isLoggedIn={isLoggedIn} user={user} />
+          <AuthenticateApp
+            isLoggedIn={isLoggedIn}
+            user={user}
+            updateUser={this.updateUser}
+          />
         ) : (
           <UnauthenticateApp
             isLoggedIn={isLoggedIn}
@@ -78,6 +95,16 @@ function AuthenticateApp(props) {
       <Route path="/" exact>
         <Home isLoggedIn={props.isLoggedIn} user={props.user} />
       </Route>
+
+      <Route path="/new_post">
+        <NewPost user={props.user} />
+      </Route>
+
+      <Route path="/settings">
+        <Settings user={props.user} updateUser={props.updateUser} />
+      </Route>
+
+      <Route path="/profile/:username" component={Profile} />
 
       <Route path="/article/:slug" component={IndividualArticle} />
 
@@ -112,4 +139,4 @@ function UnauthenticateApp(props) {
   );
 }
 
-export default App;
+export default withRouter(App);
