@@ -57,14 +57,21 @@ class Home extends React.Component {
       articles: null,
     });
     const activePageIndex = value;
-    const { userSelectedTag } = this.state;
+    const { userSelectedTag, articlesPerPage } = this.state;
     let articles, data;
     const limit = this.state.articlesPerPage;
-    const offset = (activePageIndex - 1) * 10;
+    const offset = (activePageIndex - 1) * articlesPerPage;
 
     try {
       if (userSelectedTag === null) {
         data = await myfetch(`${articleURL}?limit=${limit}&offset=${offset}`);
+      } else if (userSelectedTag === "myfeed") {
+        data = await myfetch(`${feedURL}?limit=${limit}&offset=${offset}`, {
+          method: "GET",
+          headers: {
+            authorization: `Token ${this.props.user.token}`,
+          },
+        });
       } else {
         data = await myfetch(
           `${articleURL}?tag=${userSelectedTag}&limit=${limit}&offset=${offset}`
@@ -88,15 +95,14 @@ class Home extends React.Component {
     });
 
     const limit = this.state.articlesPerPage;
-    const offset = (this.state.activePageIndex - 1) * 10;
     let articles, data, articlesCount;
 
     switch (tag) {
       case null:
-        data = await myfetch(`${articleURL}?limit=${limit}&offset=${offset}`);
+        data = await myfetch(`${articleURL}?limit=${limit}&offset=0`);
         break;
       case "myfeed":
-        data = await myfetch(`${feedURL}?limit=${limit}&offset=${offset}`, {
+        data = await myfetch(`${feedURL}?limit=${limit}&offset=0`, {
           method: "GET",
           headers: {
             authorization: `Token ${this.props.user.token}`,
@@ -106,7 +112,7 @@ class Home extends React.Component {
       default:
         let newTag = tag.replace(/#/gi, "%23");
         data = await myfetch(
-          `${articleURL}?tag=${newTag}&limit=${limit}&offset=${offset}`
+          `${articleURL}?tag=${newTag}&limit=${limit}&offset=0`
         );
         break;
     }
@@ -128,11 +134,13 @@ class Home extends React.Component {
       activePageIndex,
       userSelectedTag,
       error,
+      articlesPerPage,
       isVerifying,
     } = this.state;
     const { isLoggedIn } = this.props;
+
     const pages = [];
-    for (let i = 1; i <= Math.ceil(articlesCount / 10); i++) {
+    for (let i = 1; i <= Math.ceil(articlesCount / articlesPerPage); i++) {
       pages.push(i);
     }
 
