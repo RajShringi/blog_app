@@ -47,13 +47,9 @@ class Settings extends React.Component {
     });
     try {
       const { image, username, bio, email, password } = this.state;
-      const res = await fetch(userVerify, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          authorization: `Token ${this.props.user.token}`,
-        },
-        body: JSON.stringify({
+      let data;
+      if (password) {
+        data = {
           user: {
             image,
             username,
@@ -61,7 +57,26 @@ class Settings extends React.Component {
             email,
             password,
           },
-        }),
+        };
+      }
+      if (!password) {
+        data = {
+          user: {
+            image,
+            username,
+            bio,
+            email,
+          },
+        };
+      }
+
+      const res = await fetch(userVerify, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Token ${this.props.user.token}`,
+        },
+        body: JSON.stringify(data),
       });
       if (!res.ok) {
         const { errors } = await res.json();
