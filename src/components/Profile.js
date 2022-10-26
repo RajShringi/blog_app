@@ -35,14 +35,20 @@ class Profile extends React.Component {
     });
     const { username } = this.props.match.params;
     const { articlePerPage } = this.state;
+    let res;
 
     try {
-      const res = await fetch(`${profileURL}/${username}`, {
-        method: "GET",
-        headers: {
-          authorization: `Token ${this.props.user.token}`,
-        },
-      });
+      if (this.props.user) {
+        res = await fetch(`${profileURL}/${username}`, {
+          method: "GET",
+          headers: {
+            authorization: `Token ${this.props.user.token}`,
+          },
+        });
+      }
+      if (!this.props.user) {
+        res = await fetch(`${profileURL}/${username}`);
+      }
       if (!res.ok) {
         const { errors } = await res.json();
         throw errors;
@@ -188,19 +194,24 @@ class Profile extends React.Component {
               </div>
               <h1 className="text-2xl font-bold">{profile.username}</h1>
               <p className="font-light mb-4">{profile.bio}</p>
-              <button
-                onClick={this.handleFollowing}
-                className="mx-auto py-2 px-6 bg-indigo-400 text-white rounded-lg hover:bg-indigo-500 flex items-center space-x-2"
-              >
-                {profile.following ? (
-                  <RiUserUnfollowLine className="text-2xl" />
-                ) : (
-                  <RiUserFollowLine className="text-2xl" />
-                )}
-                <span>
-                  {profile.following ? "unfollow" : "follow"} {profile.username}
-                </span>
-              </button>
+              {this.props.user ? (
+                <button
+                  onClick={this.handleFollowing}
+                  className="mx-auto py-2 px-6 bg-indigo-400 text-white rounded-lg hover:bg-indigo-500 flex items-center space-x-2"
+                >
+                  {profile.following ? (
+                    <RiUserUnfollowLine className="text-2xl" />
+                  ) : (
+                    <RiUserFollowLine className="text-2xl" />
+                  )}
+                  <span>
+                    {profile.following ? "unfollow" : "follow"}{" "}
+                    {profile.username}
+                  </span>
+                </button>
+              ) : (
+                ""
+              )}
             </div>
 
             <div className="flex items-center justify-end">
