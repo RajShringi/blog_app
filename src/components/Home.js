@@ -205,6 +205,7 @@ class Home extends React.Component {
                   pages={pages}
                   activePageIndex={activePageIndex}
                   handleFetchPagination={this.handleFetchPagination}
+                  user={this.props.user}
                 />
               )}
             </div>
