@@ -9,16 +9,22 @@ function Article({ article }) {
       <header className="flex justify-between items-center mb-4">
         <div className="flex justify-between items-center">
           {article.author.image ? (
-            <img
-              className="h-10 w-10 object-cover rounded-full border-2 border-indigo-400 mr-4"
-              src={article.author.image}
-              alt={article.author.username}
-            />
+            <NavLink to={`/profile/${article.author.username}`}>
+              <img
+                className="h-10 w-10 object-cover rounded-full border-2 border-indigo-400 mr-4"
+                src={article.author.image}
+                alt={article.author.username}
+              />
+            </NavLink>
           ) : (
             <BsEmojiSmile className="h-10 w-10 text-indigo-400 mr-4" />
           )}
           <div>
-            <p className="text-sm text-indigo-400">{article.author.username}</p>
+            <NavLink to={`/profile/${article.author.username}`}>
+              <p className="text-sm text-indigo-400">
+                {article.author.username}
+              </p>
+            </NavLink>
             <p className="text-xs">
               {moment(article.createdAt).format("MMMM Do YYYY")}
             </p>
