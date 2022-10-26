@@ -139,6 +139,10 @@ function UnauthenticateApp(props) {
         <IndividualArticle user={props.user} />
       </Route>
 
+      <Route path="/profile/:username">
+        <Profile user={props.user} />
+      </Route>
+
       <Route path="*">
         <NoMatch />
       </Route>
