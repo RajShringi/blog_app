@@ -105,7 +105,9 @@ function AuthenticateApp(props) {
         <Settings user={props.user} updateUser={props.updateUser} />
       </Route>
 
-      <Route path="/profile/:username" component={Profile} />
+      <Route path="/profile/:username">
+        <Profile user={props.user} />
+      </Route>
 
       <Route path="/article/:slug">
         <IndividualArticle user={props.user} />
