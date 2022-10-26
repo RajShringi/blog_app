@@ -56,30 +56,17 @@ class Home extends React.Component {
     this.setState({
       articles: null,
     });
-    const activePageIndex = value;
+
     const { userSelectedTag, articlesPerPage } = this.state;
     let articles, data;
     const limit = this.state.articlesPerPage;
-    const offset = (activePageIndex - 1) * articlesPerPage;
+    const offset = (value - 1) * articlesPerPage;
 
     try {
-      if (userSelectedTag === null) {
-        data = await myfetch(`${articleURL}?limit=${limit}&offset=${offset}`);
-      } else if (userSelectedTag === "myfeed") {
-        data = await myfetch(`${feedURL}?limit=${limit}&offset=${offset}`, {
-          method: "GET",
-          headers: {
-            authorization: `Token ${this.props.user.token}`,
-          },
-        });
-      } else {
-        data = await myfetch(
-          `${articleURL}?tag=${userSelectedTag}&limit=${limit}&offset=${offset}`
-        );
-      }
+      data = await this.fetchArticles(userSelectedTag, limit, offset);
       articles = data.articles;
       this.setState({
-        activePageIndex,
+        activePageIndex: value,
         articles,
       });
     } catch (error) {
@@ -92,17 +79,31 @@ class Home extends React.Component {
   handleClickTag = async (tag) => {
     this.setState({
       articles: null,
+      userSelectedTag: tag,
     });
 
-    const limit = this.state.articlesPerPage;
-    let articles, data, articlesCount;
+    const { articlesPerPage } = this.state;
+    let data;
+
+    data = await this.fetchArticles(tag, articlesPerPage, 0);
+
+    this.setState({
+      articles: data.articles,
+      articlesCount: data.articlesCount,
+      userSelectedTag: tag,
+      activePageIndex: 1,
+    });
+  };
+
+  fetchArticles = async (tag, limit, offset) => {
+    let data;
 
     switch (tag) {
       case null:
-        data = await myfetch(`${articleURL}?limit=${limit}&offset=0`);
+        data = await myfetch(`${articleURL}?limit=${limit}&offset=${offset}`);
         break;
       case "myfeed":
-        data = await myfetch(`${feedURL}?limit=${limit}&offset=0`, {
+        data = await myfetch(`${feedURL}?limit=${limit}&offset=${offset}`, {
           method: "GET",
           headers: {
             authorization: `Token ${this.props.user.token}`,
@@ -112,19 +113,11 @@ class Home extends React.Component {
       default:
         let newTag = tag.replace(/#/gi, "%23");
         data = await myfetch(
-          `${articleURL}?tag=${newTag}&limit=${limit}&offset=0`
+          `${articleURL}?tag=${newTag}&limit=${limit}&offset=${offset}`
         );
         break;
     }
-
-    articles = data.articles;
-    articlesCount = data.articlesCount;
-    this.setState({
-      articles,
-      articlesCount,
-      userSelectedTag: tag,
-      activePageIndex: 1,
-    });
+    return data;
   };
 
   render() {
