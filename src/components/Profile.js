@@ -5,6 +5,7 @@ import { AiOutlineEdit } from "react-icons/ai";
 import Loader from "./Loader";
 import Articles from "./Articles";
 import { NavLink } from "react-router-dom";
+import { withRouter } from "react-router";
 import { myfetch } from "../utils/api";
 
 class Profile extends React.Component {
@@ -14,11 +15,21 @@ class Profile extends React.Component {
     articlesCount: "",
     articlePerPage: 10,
     activePageIndex: 1,
-    activeTab: null,
+    activeTab: "author",
     isLoading: false,
   };
 
+  componentDidUpdate = async (prevProps, _prevState) => {
+    if (this.props.match.params.username !== prevProps.match.params.username) {
+      this.fetchProfile();
+    }
+  };
+
   componentDidMount = async () => {
+    this.fetchProfile();
+  };
+
+  fetchProfile = async () => {
     this.setState({
       isLoading: true,
     });
@@ -26,7 +37,12 @@ class Profile extends React.Component {
     const { articlePerPage } = this.state;
 
     try {
-      const res = await fetch(profileURL + `/${username}`);
+      const res = await fetch(`${profileURL}/${username}`, {
+        method: "GET",
+        headers: {
+          authorization: `Token ${this.props.user.token}`,
+        },
+      });
       if (!res.ok) {
         const { errors } = await res.json();
         throw errors;
@@ -42,6 +58,7 @@ class Profile extends React.Component {
         profile,
         articles,
         articlesCount,
+        activeTab: "author",
         isLoading: false,
       });
     } catch (errors) {
@@ -58,27 +75,35 @@ class Profile extends React.Component {
     });
     const { username } = this.props.match.params;
     const { articlePerPage } = this.state;
-    const activePageIndex = value;
+    const offset = (value - 1) * 1;
 
-    const offset = (activePageIndex - 1) * 1;
+    this.fetchArticles(
+      this.state.activeTab,
+      username,
+      articlePerPage,
+      offset,
+      value
+    );
+  };
 
+  handleClickTab = async (tab) => {
+    this.setState({
+      articles: null,
+      activeTab: tab,
+    });
+    const { username } = this.props.match.params;
+    const { articlePerPage } = this.state;
+    this.fetchArticles(tab, username, articlePerPage, 0, 1);
+  };
+
+  fetchArticles = async (tab, username, limit, offset, activePageIndex) => {
     try {
       let data;
-      switch (this.state.activeTab) {
-        case null:
-          data = await myfetch(
-            `${articleURL}?author=${username}&limit=${articlePerPage}&offset=${offset}`
-          );
-          break;
-        case "fav":
-          data = await myfetch(
-            `${articleURL}?favorited=${username}&limit=${articlePerPage}&offset=${offset}`
-          );
-          break;
-        default:
-          break;
-      }
+      data = await myfetch(
+        `${articleURL}?${tab}=${username}&limit=${limit}&offset=${offset}`
+      );
       this.setState({
+        activeTab: tab,
         articles: data.articles,
         articlesCount: data.articlesCount,
         activePageIndex,
@@ -88,36 +113,43 @@ class Profile extends React.Component {
     }
   };
 
-  handleClickTab = async (tab) => {
-    this.setState({
-      articles: null,
-    });
+  handleFollowing = async () => {
+    const { profile } = this.state;
     const { username } = this.props.match.params;
-    const { articlePerPage } = this.state;
+    this.setState({
+      isLoading: true,
+    });
 
     try {
-      let data;
-      switch (tab) {
-        case null:
-          data = await myfetch(
-            `${articleURL}?author=${username}&limit=${articlePerPage}&offset=0`
-          );
-          break;
-        case "fav":
-          data = await myfetch(
-            `${articleURL}?favorited=${username}&limit=${articlePerPage}&offset=0`
-          );
-          break;
-        default:
-          break;
+      let res, data;
+      if (!profile.following) {
+        res = await fetch(`${profileURL}/${username}/follow`, {
+          method: "POST",
+          headers: {
+            authorization: `Token ${this.props.user.token}`,
+          },
+        });
+      } else {
+        res = await fetch(profileURL + `/${username}/follow`, {
+          method: "DELETE",
+          headers: {
+            authorization: `Token ${this.props.user.token}`,
+          },
+        });
       }
+      if (!res.ok) {
+        const { errors } = await res.json();
+        throw errors;
+      }
+      data = await res.json();
       this.setState({
-        activeTab: tab,
-        articles: data.articles,
-        articlesCount: data.articlesCount,
-        activePageIndex: 1,
+        profile: data.profile,
+        isLoading: false,
       });
     } catch (errors) {
+      this.setState({
+        isLoading: false,
+      });
       console.log(errors);
     }
   };
@@ -156,13 +188,18 @@ class Profile extends React.Component {
               </div>
               <h1 className="text-2xl font-bold">{profile.username}</h1>
               <p className="font-light mb-4">{profile.bio}</p>
-              <button className="mx-auto py-2 px-6 bg-indigo-400 text-white rounded-lg hover:bg-indigo-500 flex items-center space-x-2">
+              <button
+                onClick={this.handleFollowing}
+                className="mx-auto py-2 px-6 bg-indigo-400 text-white rounded-lg hover:bg-indigo-500 flex items-center space-x-2"
+              >
                 {profile.following ? (
                   <RiUserUnfollowLine className="text-2xl" />
                 ) : (
                   <RiUserFollowLine className="text-2xl" />
                 )}
-                <span>Follow {profile.username}</span>
+                <span>
+                  {profile.following ? "unfollow" : "follow"} {profile.username}
+                </span>
               </button>
             </div>
 
@@ -180,9 +217,9 @@ class Profile extends React.Component {
           <nav className="">
             <ul className="flex items-center space-x-4">
               <li
-                onClick={() => this.handleClickTab(null)}
+                onClick={() => this.handleClickTab("author")}
                 className={`p-2 cursor-pointer ${
-                  activeTab === null
+                  activeTab === "author"
                     ? "bg-indigo-400 text-white"
                     : "bg-gray-100"
                 }`}
@@ -190,9 +227,9 @@ class Profile extends React.Component {
                 My articles
               </li>
               <li
-                onClick={() => this.handleClickTab("fav")}
+                onClick={() => this.handleClickTab("favorited")}
                 className={`p-2 cursor-pointer ${
-                  activeTab === "fav"
+                  activeTab === "favorited"
                     ? "bg-indigo-400 text-white"
                     : "bg-gray-100"
                 }`}
@@ -219,4 +256,4 @@ class Profile extends React.Component {
     );
   }
 }
-export default Profile;
+export default withRouter(Profile);

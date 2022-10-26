@@ -2,6 +2,8 @@ import React from "react";
 import { myfetch } from "../utils/api";
 import moment from "moment";
 import Loader from "./Loader";
+import { withRouter } from "react-router";
+import { Link } from "react-router-dom";
 
 class IndividualArticle extends React.Component {
   constructor(props) {
@@ -31,6 +33,7 @@ class IndividualArticle extends React.Component {
     const { article, error } = this.state;
 
     const paragrphs = article && article.body.split("\n\n");
+
     if (error) {
       return (
         <p className="text-center my-4 text-lg font-bold">
@@ -79,10 +82,32 @@ class IndividualArticle extends React.Component {
                 {article.tagList}
               </p>
             </div>
+
+            <footer>
+              <div className="container mx-auto my-6">
+                {this.props.user ? (
+                  ""
+                ) : (
+                  <p className="text-center">
+                    <Link className="text-indigo-400 font-semibold" to="/login">
+                      Sign in
+                    </Link>{" "}
+                    or{" "}
+                    <Link
+                      className="text-indigo-400 font-semibold"
+                      to="/signup"
+                    >
+                      Sign up
+                    </Link>{" "}
+                    to add comments on this article.
+                  </p>
+                )}
+              </div>
+            </footer>
           </div>
         )}
       </div>
     );
   }
 }
-export default IndividualArticle;
+export default withRouter(IndividualArticle);

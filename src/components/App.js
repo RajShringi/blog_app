@@ -81,6 +81,7 @@ class App extends React.Component {
         ) : (
           <UnauthenticateApp
             isLoggedIn={isLoggedIn}
+            user={user}
             updateUser={this.updateUser}
           />
         )}
@@ -104,9 +105,13 @@ function AuthenticateApp(props) {
         <Settings user={props.user} updateUser={props.updateUser} />
       </Route>
 
-      <Route path="/profile/:username" component={Profile} />
+      <Route path="/profile/:username">
+        <Profile user={props.user} />
+      </Route>
 
-      <Route path="/article/:slug" component={IndividualArticle} />
+      <Route path="/article/:slug">
+        <IndividualArticle user={props.user} />
+      </Route>
 
       <Route path="*">
         <NoMatch />
@@ -130,7 +135,9 @@ function UnauthenticateApp(props) {
         <Singup updateUser={props.updateUser} />
       </Route>
 
-      <Route path="/article/:slug" component={IndividualArticle} />
+      <Route path="/article/:slug">
+        <IndividualArticle user={props.user} />
+      </Route>
 
       <Route path="*">
         <NoMatch />
