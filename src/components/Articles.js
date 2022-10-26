@@ -1,6 +1,12 @@
 import Article from "./Article";
 
-function Articles({ articles, pages, activePageIndex, handleFetchPagination }) {
+function Articles({
+  articles,
+  pages,
+  activePageIndex,
+  handleFetchPagination,
+  user,
+}) {
   if (articles.length < 1) {
     return (
       <h2 className="text-center font-bold text-4xl">No Articles Found</h2>
@@ -11,7 +17,7 @@ function Articles({ articles, pages, activePageIndex, handleFetchPagination }) {
     <div>
       {/* Articles */}
       {articles.map((article) => (
-        <Article key={article.slug} article={article} />
+        <Article key={article.slug} article={article} user={user} />
       ))}
 
       {/* Pagination */}
