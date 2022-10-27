@@ -1,6 +1,7 @@
 import React from "react";
 import { Route, Switch, withRouter } from "react-router-dom";
 import { localStorageKey, userVerify } from "../utils/constant";
+import EditPost from "./EditPost";
 import Header from "./Header";
 import Home from "./Home";
 import IndividualArticle from "./IndividualArticle";
@@ -99,6 +100,10 @@ function AuthenticateApp(props) {
 
       <Route path="/new_post">
         <NewPost user={props.user} />
+      </Route>
+
+      <Route path="/edit_post/:slug">
+        <EditPost user={props.user} />
       </Route>
 
       <Route path="/settings">

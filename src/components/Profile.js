@@ -194,7 +194,8 @@ class Profile extends React.Component {
               </div>
               <h1 className="text-2xl font-bold">{profile.username}</h1>
               <p className="font-light mb-4">{profile.bio}</p>
-              {this.props.user ? (
+              {this.props.user &&
+              this.props.user.username !== profile.username ? (
                 <button
                   onClick={this.handleFollowing}
                   className="mx-auto py-2 px-6 bg-indigo-400 text-white rounded-lg hover:bg-indigo-500 flex items-center space-x-2"
@@ -259,6 +260,7 @@ class Profile extends React.Component {
                 pages={pages}
                 activePageIndex={activePageIndex}
                 handleFetchPagination={this.handleFetchPagination}
+                user={this.props.user}
               />
             )}
           </div>
