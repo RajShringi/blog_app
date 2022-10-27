@@ -4,13 +4,20 @@ import moment from "moment";
 import Loader from "./Loader";
 import { withRouter } from "react-router";
 import { Link } from "react-router-dom";
+import { articleURL } from "../utils/constant";
+import Comments from "./Comments";
 
 class IndividualArticle extends React.Component {
   constructor(props) {
     super();
     this.state = {
       article: null,
+      comments: null,
       error: null,
+      body: "",
+      errors: {
+        body: "",
+      },
     };
   }
 
@@ -19,8 +26,19 @@ class IndividualArticle extends React.Component {
       const { article } = await myfetch(
         `https://mighty-oasis-08080.herokuapp.com/api/articles/${this.props.match.params.slug}`
       );
+      const { comments } = await myfetch(
+        `${articleURL}/${article.slug}/comments`,
+        {
+          method: "GET",
+          headers: {
+            authorization: `Token ${this.props.user.token}`,
+          },
+        }
+      );
+
       this.setState({
         article,
+        comments,
       });
     } catch (error) {
       this.setState({
@@ -29,8 +47,87 @@ class IndividualArticle extends React.Component {
     }
   }
 
+  handleChange = ({ target }) => {
+    const { name, value } = target;
+    const errors = { ...this.state.errors };
+    if (!value) {
+      errors[name] = "can't be empty";
+    } else {
+      errors[name] = "";
+    }
+
+    this.setState({
+      [name]: value,
+      errors,
+    });
+  };
+
+  handleSubmitComment = async (e) => {
+    e.preventDefault();
+    try {
+      if (!this.state.body) {
+        throw new Error("can't be empty");
+      }
+      const { comment } = await myfetch(
+        `${articleURL}/${this.state.article.slug}/comments`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `Token ${this.props.user.token}`,
+          },
+          body: JSON.stringify({
+            comment: {
+              body: this.state.body,
+            },
+          }),
+        }
+      );
+      this.setState((prevState) => {
+        return {
+          body: "",
+          comments: [comment, ...prevState.comments],
+        };
+      });
+    } catch (error) {
+      this.setState({
+        errors: {
+          body: error.message,
+        },
+      });
+      console.log(error);
+    }
+  };
+
+  handleClickDelete = async (id) => {
+    try {
+      const res = await fetch(
+        `${articleURL}/${this.state.article.slug}/comments/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            authorization: `Token ${this.props.user.token}`,
+          },
+        }
+      );
+      if (!res.ok) {
+        const error = await res.json();
+        throw error;
+      }
+
+      const comments = this.state.comments.filter(
+        (comment) => comment.id !== id
+      );
+      this.setState({
+        comments,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   render() {
-    const { article, error } = this.state;
+    const { article, comments, error, body } = this.state;
 
     const paragrphs = article && article.body.split("\n\n");
 
@@ -86,7 +183,15 @@ class IndividualArticle extends React.Component {
             <footer>
               <div className="container mx-auto my-6">
                 {this.props.user ? (
-                  ""
+                  <Comments
+                    comments={comments}
+                    user={this.props.user}
+                    body={body}
+                    errors={this.state.errors}
+                    handleChange={this.handleChange}
+                    handleSubmitComment={this.handleSubmitComment}
+                    handleClickDelete={this.handleClickDelete}
+                  />
                 ) : (
                   <p className="text-center">
                     <Link className="text-indigo-400 font-semibold" to="/login">
@@ -110,4 +215,5 @@ class IndividualArticle extends React.Component {
     );
   }
 }
+
 export default withRouter(IndividualArticle);
