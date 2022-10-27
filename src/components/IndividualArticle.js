@@ -3,8 +3,9 @@ import { myfetch } from "../utils/api";
 import moment from "moment";
 import Loader from "./Loader";
 import { withRouter } from "react-router";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { articleURL } from "../utils/constant";
+import { AiOutlineEdit, AiOutlineDelete } from "react-icons/ai";
 import Comments from "./Comments";
 
 class IndividualArticle extends React.Component {
@@ -162,6 +163,25 @@ class IndividualArticle extends React.Component {
                       {moment(article.createdAt).format("MMMM Do YYYY")}
                     </p>
                   </div>
+                </div>
+                <div className="my-6 flex items-center space-x-2">
+                  <NavLink to={`/edit_post/${article.slug}`}>
+                    {this.props.user.username === article.author.username && (
+                      <button className="py-2 px-6 bg-zinc-600 hover:bg-zinc-700 flex items-center space-x-2">
+                        <AiOutlineEdit className="text-2xl" />
+                        <span>Edit Article</span>
+                      </button>
+                    )}
+                  </NavLink>
+
+                  <NavLink to={`/edit_post/${article.slug}`}>
+                    {this.props.user.username === article.author.username && (
+                      <button className="py-2 px-6 bg-rose-400 hover:bg-zinc-700 flex items-center space-x-2">
+                        <AiOutlineDelete className="text-2xl" />
+                        <span>Delete Article</span>
+                      </button>
+                    )}
+                  </NavLink>
                 </div>
               </div>
             </header>
