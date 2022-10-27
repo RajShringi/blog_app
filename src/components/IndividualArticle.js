@@ -6,6 +6,7 @@ import { withRouter } from "react-router";
 import { Link, NavLink } from "react-router-dom";
 import { articleURL } from "../utils/constant";
 import { AiOutlineEdit, AiOutlineDelete } from "react-icons/ai";
+import { BsEmojiSmile } from "react-icons/bs";
 import Comments from "./Comments";
 
 class IndividualArticle extends React.Component {
@@ -27,19 +28,25 @@ class IndividualArticle extends React.Component {
       const { article } = await myfetch(
         `https://mighty-oasis-08080.herokuapp.com/api/articles/${this.props.match.params.slug}`
       );
-      const { comments } = await myfetch(
-        `${articleURL}/${article.slug}/comments`,
-        {
-          method: "GET",
-          headers: {
-            authorization: `Token ${this.props.user.token}`,
-          },
-        }
-      );
+      if (this.props.user) {
+        const { comments } = await myfetch(
+          `${articleURL}/${article.slug}/comments`,
+          {
+            method: "GET",
+            headers: {
+              authorization: `Token ${this.props.user.token}`,
+            },
+          }
+        );
+        this.setState({
+          article,
+          comments,
+        });
+        return;
+      }
 
       this.setState({
         article,
-        comments,
       });
     } catch (error) {
       this.setState({
@@ -127,6 +134,25 @@ class IndividualArticle extends React.Component {
     }
   };
 
+  handleArticleDelete = async () => {
+    try {
+      const res = await fetch(`${articleURL}/${this.state.article.slug}`, {
+        method: "DELETE",
+        headers: {
+          authorization: `Token ${this.props.user.token}`,
+        },
+      });
+      if (!res.ok) {
+        const { errors } = await res.json();
+        throw errors;
+      }
+
+      this.props.history.push("/");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   render() {
     const { article, comments, error, body } = this.state;
 
@@ -150,15 +176,23 @@ class IndividualArticle extends React.Component {
               <div className="container mx-auto">
                 <h1 className="text-4xl mb-4">{article.title}</h1>
                 <div className="flex items-center">
-                  <img
-                    className="h-10 w-10 object-cover rounded-full mr-4"
-                    src={article.author.image}
-                    alt={article.author.username}
-                  />
+                  {article.author.image ? (
+                    <NavLink to={`/profile/${article.author.username}`}>
+                      <img
+                        className="h-10 w-10 object-cover rounded-full border-2 border-indigo-400 mr-4"
+                        src={article.author.image}
+                        alt={article.author.username}
+                      />
+                    </NavLink>
+                  ) : (
+                    <BsEmojiSmile className="h-10 w-10 text-indigo-400 mr-4" />
+                  )}
                   <div>
-                    <p className="text-sm text-indigo-400 font-bold">
-                      {article.author.username}
-                    </p>
+                    <NavLink to={`/profile/${article.author.username}`}>
+                      <p className="text-sm text-indigo-400">
+                        {article.author.username}
+                      </p>
+                    </NavLink>
                     <p className="text-xs">
                       {moment(article.createdAt).format("MMMM Do YYYY")}
                     </p>
@@ -166,22 +200,25 @@ class IndividualArticle extends React.Component {
                 </div>
                 <div className="my-6 flex items-center space-x-2">
                   <NavLink to={`/edit_post/${article.slug}`}>
-                    {this.props.user.username === article.author.username && (
-                      <button className="py-2 px-6 bg-zinc-600 hover:bg-zinc-700 flex items-center space-x-2">
-                        <AiOutlineEdit className="text-2xl" />
-                        <span>Edit Article</span>
-                      </button>
-                    )}
+                    {this.props.user &&
+                      this.props.user.username === article.author.username && (
+                        <button className="py-2 px-6 bg-zinc-600 hover:bg-zinc-700 flex items-center space-x-2">
+                          <AiOutlineEdit className="text-2xl" />
+                          <span>Edit Article</span>
+                        </button>
+                      )}
                   </NavLink>
 
-                  <NavLink to={`/edit_post/${article.slug}`}>
-                    {this.props.user.username === article.author.username && (
-                      <button className="py-2 px-6 bg-rose-400 hover:bg-zinc-700 flex items-center space-x-2">
+                  {this.props.user &&
+                    this.props.user.username === article.author.username && (
+                      <button
+                        onClick={this.handleArticleDelete}
+                        className="py-2 px-6 bg-rose-400 hover:bg-zinc-700 flex items-center space-x-2"
+                      >
                         <AiOutlineDelete className="text-2xl" />
                         <span>Delete Article</span>
                       </button>
                     )}
-                  </NavLink>
                 </div>
               </div>
             </header>
