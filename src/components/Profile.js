@@ -81,7 +81,7 @@ class Profile extends React.Component {
     });
     const { username } = this.props.match.params;
     const { articlePerPage } = this.state;
-    const offset = (value - 1) * 1;
+    const offset = (value - 1) * articlePerPage;
 
     this.fetchArticles(
       this.state.activeTab,
