@@ -2,6 +2,7 @@ import React from "react";
 import { Route, Switch, withRouter } from "react-router-dom";
 import { localStorageKey, userVerify } from "../utils/constant";
 import EditPost from "./EditPost";
+import ErrorBoundary from "./ErrorBoundary";
 import Header from "./Header";
 import Home from "./Home";
 import IndividualArticle from "./IndividualArticle";
@@ -72,20 +73,22 @@ class App extends React.Component {
     }
     return (
       <div className="h-screen overflow-y-scroll text-gray-700 bg-gray-50">
-        <Header isLoggedIn={isLoggedIn} user={user} logout={this.logout} />
-        {isLoggedIn ? (
-          <AuthenticateApp
-            isLoggedIn={isLoggedIn}
-            user={user}
-            updateUser={this.updateUser}
-          />
-        ) : (
-          <UnauthenticateApp
-            isLoggedIn={isLoggedIn}
-            user={user}
-            updateUser={this.updateUser}
-          />
-        )}
+        <ErrorBoundary>
+          <Header isLoggedIn={isLoggedIn} user={user} logout={this.logout} />
+          {isLoggedIn ? (
+            <AuthenticateApp
+              isLoggedIn={isLoggedIn}
+              user={user}
+              updateUser={this.updateUser}
+            />
+          ) : (
+            <UnauthenticateApp
+              isLoggedIn={isLoggedIn}
+              user={user}
+              updateUser={this.updateUser}
+            />
+          )}
+        </ErrorBoundary>
       </div>
     );
   }
