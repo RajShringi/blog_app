@@ -1,6 +1,7 @@
 import React from "react";
 import { articleURL } from "../utils/constant";
 import { withRouter } from "react-router";
+import { UserContext } from "../UserContext";
 
 class NewPost extends React.Component {
   state = {
@@ -15,6 +16,8 @@ class NewPost extends React.Component {
       tags: "",
     },
   };
+
+  static contextType = UserContext;
 
   handleChange = ({ target }) => {
     const { name, value } = target;
@@ -42,7 +45,7 @@ class NewPost extends React.Component {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          authorization: `Token ${this.props.user.token}`,
+          authorization: `Token ${this.context.user.token}`,
         },
         body: JSON.stringify({
           article: {

@@ -1,5 +1,6 @@
 import React from "react";
 import { Route, Switch, withRouter } from "react-router-dom";
+import { UserContext } from "../UserContext";
 import { localStorageKey, userVerify } from "../utils/constant";
 import EditPost from "./EditPost";
 import ErrorBoundary from "./ErrorBoundary";
@@ -67,27 +68,23 @@ class App extends React.Component {
   };
 
   render() {
-    const { isLoggedIn, user, isVerifying } = this.state;
+    const { isLoggedIn, isVerifying } = this.state;
     if (isVerifying) {
       return <Loader />;
     }
     return (
       <div className="h-screen overflow-y-scroll text-gray-700 bg-gray-50">
         <ErrorBoundary>
-          <Header isLoggedIn={isLoggedIn} user={user} logout={this.logout} />
-          {isLoggedIn ? (
-            <AuthenticateApp
-              isLoggedIn={isLoggedIn}
-              user={user}
-              updateUser={this.updateUser}
-            />
-          ) : (
-            <UnauthenticateApp
-              isLoggedIn={isLoggedIn}
-              user={user}
-              updateUser={this.updateUser}
-            />
-          )}
+          <UserContext.Provider
+            value={{
+              ...this.state,
+              logout: this.logout,
+              updateUser: this.updateUser,
+            }}
+          >
+            <Header />
+            {isLoggedIn ? <AuthenticateApp /> : <UnauthenticateApp />}
+          </UserContext.Provider>
         </ErrorBoundary>
       </div>
     );
@@ -98,27 +95,27 @@ function AuthenticateApp(props) {
   return (
     <Switch>
       <Route path="/" exact>
-        <Home isLoggedIn={props.isLoggedIn} user={props.user} />
+        <Home />
       </Route>
 
       <Route path="/new_post">
-        <NewPost user={props.user} />
+        <NewPost />
       </Route>
 
       <Route path="/edit_post/:slug">
-        <EditPost user={props.user} />
+        <EditPost />
       </Route>
 
       <Route path="/settings">
-        <Settings user={props.user} updateUser={props.updateUser} />
+        <Settings />
       </Route>
 
       <Route path="/profile/:username">
-        <Profile user={props.user} />
+        <Profile />
       </Route>
 
       <Route path="/article/:slug">
-        <IndividualArticle user={props.user} />
+        <IndividualArticle />
       </Route>
 
       <Route path="*">
@@ -132,23 +129,23 @@ function UnauthenticateApp(props) {
   return (
     <Switch>
       <Route path="/" exact>
-        <Home isLoggedIn={props.isLoggedIn} user={props.user} />
+        <Home />
       </Route>
 
       <Route path="/login">
-        <Login updateUser={props.updateUser} />
+        <Login />
       </Route>
 
       <Route path="/signup">
-        <Singup updateUser={props.updateUser} />
+        <Singup />
       </Route>
 
       <Route path="/article/:slug">
-        <IndividualArticle user={props.user} />
+        <IndividualArticle />
       </Route>
 
       <Route path="/profile/:username">
-        <Profile user={props.user} />
+        <Profile />
       </Route>
 
       <Route path="*">

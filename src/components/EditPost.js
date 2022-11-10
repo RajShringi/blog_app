@@ -1,6 +1,7 @@
 import React from "react";
 import { articleURL } from "../utils/constant";
 import { withRouter } from "react-router";
+import { UserContext } from "../UserContext";
 
 class EditPost extends React.Component {
   state = {
@@ -15,6 +16,8 @@ class EditPost extends React.Component {
       tags: "",
     },
   };
+
+  static contextType = UserContext;
 
   componentDidMount = async () => {
     try {
@@ -61,7 +64,7 @@ class EditPost extends React.Component {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          authorization: `Token ${this.props.user.token}`,
+          authorization: `Token ${this.context.user.token}`,
         },
         body: JSON.stringify({
           article: {

@@ -4,19 +4,22 @@ import { withRouter } from "react-router";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Loader from "./Loader";
+import { UserContext } from "../UserContext";
 
 class Settings extends React.Component {
   state = {
-    image: this.props.user.image || "",
-    username: this.props.user.username || "",
-    bio: this.props.user.bio || "",
-    email: this.props.user.email || "",
+    image: this.context.user.image || "",
+    username: this.context.user.username || "",
+    bio: this.context.user.bio || "",
+    email: this.context.user.email || "",
     isLoading: false,
     password: "",
     errors: {
       email: "",
     },
   };
+
+  static contextType = UserContext;
 
   handleChagne = ({ target }) => {
     const { name, value } = target;
@@ -74,7 +77,7 @@ class Settings extends React.Component {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          authorization: `Token ${this.props.user.token}`,
+          authorization: `Token ${this.context.user.token}`,
         },
         body: JSON.stringify(data),
       });
@@ -83,7 +86,7 @@ class Settings extends React.Component {
         throw errors;
       }
       const { user } = await res.json();
-      this.props.updateUser(user);
+      this.context.updateUser(user);
       this.setState({
         isLoading: false,
       });

@@ -2,8 +2,11 @@ import { NavLink } from "react-router-dom";
 import { MdOutlineLibraryAdd, MdSettings, MdHome } from "react-icons/md";
 import { CgProfile } from "react-icons/cg";
 import { FiLogOut } from "react-icons/fi";
+import { useContext } from "react";
+import { UserContext } from "../UserContext";
 
-function Header({ isLoggedIn, user, logout }) {
+function Header() {
+  const { isLoggedIn, user, logout } = useContext(UserContext);
   return (
     <div className="py-4 shadow-sm bg-white box-border">
       <header className="container mx-auto">
