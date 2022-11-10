@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 import validate from "../utils/validate";
 import { loginURL } from "../utils/constant";
 import { withRouter } from "react-router";
+import { UserContext } from "../UserContext";
 
 class Login extends React.Component {
   state = {
@@ -15,6 +16,7 @@ class Login extends React.Component {
       username: "",
     },
   };
+  static contextType = UserContext;
 
   handleChange = ({ target }) => {
     const { name, value } = target;
@@ -47,7 +49,7 @@ class Login extends React.Component {
         throw errors;
       }
       const { user } = await res.json();
-      this.props.updateUser(user);
+      this.context.updateUser(user);
       this.props.history.push("/");
     } catch (error) {
       this.setState((prevState) => {

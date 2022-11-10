@@ -8,6 +8,9 @@ import { articleURL } from "../utils/constant";
 import { AiOutlineEdit, AiOutlineDelete } from "react-icons/ai";
 import { BsEmojiSmile } from "react-icons/bs";
 import Comments from "./Comments";
+import { UserContext } from "../UserContext";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 class IndividualArticle extends React.Component {
   constructor(props) {
@@ -23,18 +26,20 @@ class IndividualArticle extends React.Component {
     };
   }
 
+  static contextType = UserContext;
+
   async componentDidMount() {
     try {
       const { article } = await myfetch(
         `https://mighty-oasis-08080.herokuapp.com/api/articles/${this.props.match.params.slug}`
       );
-      if (this.props.user) {
+      if (this.context.user) {
         const { comments } = await myfetch(
           `${articleURL}/${article.slug}/comments`,
           {
             method: "GET",
             headers: {
-              authorization: `Token ${this.props.user.token}`,
+              authorization: `Token ${this.context.user.token}`,
             },
           }
         );
@@ -82,7 +87,7 @@ class IndividualArticle extends React.Component {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            authorization: `Token ${this.props.user.token}`,
+            authorization: `Token ${this.context.user.token}`,
           },
           body: JSON.stringify({
             comment: {
@@ -114,7 +119,7 @@ class IndividualArticle extends React.Component {
         {
           method: "DELETE",
           headers: {
-            authorization: `Token ${this.props.user.token}`,
+            authorization: `Token ${this.context.user.token}`,
           },
         }
       );
@@ -139,7 +144,7 @@ class IndividualArticle extends React.Component {
       const res = await fetch(`${articleURL}/${this.state.article.slug}`, {
         method: "DELETE",
         headers: {
-          authorization: `Token ${this.props.user.token}`,
+          authorization: `Token ${this.context.user.token}`,
         },
       });
       if (!res.ok) {
@@ -155,8 +160,6 @@ class IndividualArticle extends React.Component {
 
   render() {
     const { article, comments, error, body } = this.state;
-
-    const paragrphs = article && article.body.split("\n\n");
 
     if (error) {
       return (
@@ -200,8 +203,9 @@ class IndividualArticle extends React.Component {
                 </div>
                 <div className="my-6 flex items-center space-x-2">
                   <NavLink to={`/edit_post/${article.slug}`}>
-                    {this.props.user &&
-                      this.props.user.username === article.author.username && (
+                    {this.context.user &&
+                      this.context.user.username ===
+                        article.author.username && (
                         <button className="py-2 px-6 bg-zinc-600 hover:bg-zinc-700 flex items-center space-x-2">
                           <AiOutlineEdit className="text-2xl" />
                           <span>Edit Article</span>
@@ -209,8 +213,8 @@ class IndividualArticle extends React.Component {
                       )}
                   </NavLink>
 
-                  {this.props.user &&
-                    this.props.user.username === article.author.username && (
+                  {this.context.user &&
+                    this.context.user.username === article.author.username && (
                       <button
                         onClick={this.handleArticleDelete}
                         className="py-2 px-6 bg-rose-400 hover:bg-zinc-700 flex items-center space-x-2"
@@ -225,13 +229,12 @@ class IndividualArticle extends React.Component {
 
             {/* Article Body */}
             <div className="container mx-auto border-b py-4">
-              <ul>
-                {paragrphs.map((para, index) => (
-                  <li className="my-4 text-lg" key={index}>
-                    {para}
-                  </li>
-                ))}
-              </ul>
+              <ReactMarkdown
+                className="prose  prose-a:text-indigo-500 lg:prose-xl"
+                remarkPlugins={[[remarkGfm, { singleTilde: false }]]}
+              >
+                {article.body}
+              </ReactMarkdown>
               <p className="text-sm text-gray-500 p-2 border rounded-full inline-block">
                 {article.tagList}
               </p>
@@ -239,10 +242,10 @@ class IndividualArticle extends React.Component {
 
             <footer>
               <div className="container mx-auto my-6">
-                {this.props.user ? (
+                {this.context.user ? (
                   <Comments
                     comments={comments}
-                    user={this.props.user}
+                    user={this.context.user}
                     body={body}
                     errors={this.state.errors}
                     handleChange={this.handleChange}

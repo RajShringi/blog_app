@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 import validate from "../utils/validate";
 import { singupURL } from "../utils/constant";
 import { withRouter } from "react-router";
+import { UserContext } from "../UserContext";
 
 class Singup extends React.Component {
   state = {
@@ -15,6 +16,8 @@ class Singup extends React.Component {
       username: "",
     },
   };
+
+  static contextType = UserContext;
 
   handleChange = ({ target }) => {
     const { name, value } = target;
@@ -50,7 +53,7 @@ class Singup extends React.Component {
       }
 
       const { user } = await res.json();
-      this.props.updateUser(user);
+      this.context.updateUser(user);
       this.props.history.push("/");
     } catch (errors) {
       console.log(errors);

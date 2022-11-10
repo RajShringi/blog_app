@@ -7,6 +7,7 @@ import Articles from "./Articles";
 import { NavLink } from "react-router-dom";
 import { withRouter } from "react-router";
 import { myfetch } from "../utils/api";
+import { UserContext } from "../UserContext";
 
 class Profile extends React.Component {
   state = {
@@ -18,6 +19,8 @@ class Profile extends React.Component {
     activeTab: "author",
     isLoading: false,
   };
+
+  static contextType = UserContext;
 
   componentDidUpdate = async (prevProps, _prevState) => {
     if (this.props.match.params.username !== prevProps.match.params.username) {
@@ -38,15 +41,15 @@ class Profile extends React.Component {
     let res;
 
     try {
-      if (this.props.user) {
+      if (this.context.user) {
         res = await fetch(`${profileURL}/${username}`, {
           method: "GET",
           headers: {
-            authorization: `Token ${this.props.user.token}`,
+            authorization: `Token ${this.context.user.token}`,
           },
         });
       }
-      if (!this.props.user) {
+      if (!this.context.user) {
         res = await fetch(`${profileURL}/${username}`);
       }
       if (!res.ok) {
@@ -132,14 +135,14 @@ class Profile extends React.Component {
         res = await fetch(`${profileURL}/${username}/follow`, {
           method: "POST",
           headers: {
-            authorization: `Token ${this.props.user.token}`,
+            authorization: `Token ${this.context.user.token}`,
           },
         });
       } else {
         res = await fetch(profileURL + `/${username}/follow`, {
           method: "DELETE",
           headers: {
-            authorization: `Token ${this.props.user.token}`,
+            authorization: `Token ${this.context.user.token}`,
           },
         });
       }
@@ -194,8 +197,8 @@ class Profile extends React.Component {
               </div>
               <h1 className="text-2xl font-bold">{profile.username}</h1>
               <p className="font-light mb-4">{profile.bio}</p>
-              {this.props.user &&
-              this.props.user.username !== profile.username ? (
+              {this.context.user &&
+              this.context.user.username !== profile.username ? (
                 <button
                   onClick={this.handleFollowing}
                   className="mx-auto py-2 px-6 bg-indigo-400 text-white rounded-lg hover:bg-indigo-500 flex items-center space-x-2"
@@ -260,7 +263,7 @@ class Profile extends React.Component {
                 pages={pages}
                 activePageIndex={activePageIndex}
                 handleFetchPagination={this.handleFetchPagination}
-                user={this.props.user}
+                user={this.context.user}
               />
             )}
           </div>

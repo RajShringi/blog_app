@@ -4,6 +4,7 @@ import Tags from "./Tags";
 import { myfetch } from "../utils/api";
 import Articles from "./Articles";
 import { articleURL, feedURL } from "../utils/constant";
+import { UserContext } from "../UserContext";
 
 class Home extends React.Component {
   constructor(props) {
@@ -24,14 +25,14 @@ class Home extends React.Component {
       const limit = this.state.articlesPerPage;
       const offset = (this.state.activePageIndex - 1) * limit;
       let data, userSelectedTag;
-      if (!this.props.isLoggedIn) {
+      if (!this.context.isLoggedIn) {
         data = await myfetch(`${articleURL}?limit=${limit}&offset=${offset}`);
         userSelectedTag = null;
       } else {
         data = await myfetch(`${feedURL}?limit=${limit}&offset=${offset}`, {
           method: "GET",
           headers: {
-            authorization: `Token ${this.props.user.token}`,
+            authorization: `Token ${this.context.user.token}`,
           },
         });
         userSelectedTag = "myfeed";
@@ -106,7 +107,7 @@ class Home extends React.Component {
         data = await myfetch(`${feedURL}?limit=${limit}&offset=${offset}`, {
           method: "GET",
           headers: {
-            authorization: `Token ${this.props.user.token}`,
+            authorization: `Token ${this.context.user.token}`,
           },
         });
         break;
@@ -120,6 +121,8 @@ class Home extends React.Component {
     return data;
   };
 
+  static contextType = UserContext;
+
   render() {
     const {
       articles,
@@ -130,7 +133,7 @@ class Home extends React.Component {
       articlesPerPage,
       isVerifying,
     } = this.state;
-    const { isLoggedIn } = this.props;
+    const { isLoggedIn } = this.context;
 
     const pages = [];
     for (let i = 1; i <= Math.ceil(articlesCount / articlesPerPage); i++) {
@@ -205,7 +208,7 @@ class Home extends React.Component {
                   pages={pages}
                   activePageIndex={activePageIndex}
                   handleFetchPagination={this.handleFetchPagination}
-                  user={this.props.user}
+                  user={this.context.user}
                 />
               )}
             </div>
