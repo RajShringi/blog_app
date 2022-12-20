@@ -31,7 +31,7 @@ class IndividualArticle extends React.Component {
   async componentDidMount() {
     try {
       const { article } = await myfetch(
-        `https://mighty-oasis-08080.herokuapp.com/api/articles/${this.props.match.params.slug}`
+        `${articleURL}/${this.props.match.params.slug}`
       );
       if (this.context.user) {
         const { comments } = await myfetch(
@@ -176,7 +176,7 @@ class IndividualArticle extends React.Component {
           <div>
             {/* Article Header */}
             <header className="bg-zinc-800 text-white py-12 h-min-[200px]">
-              <div className="container mx-auto">
+              <div className="max-w-2xl mx-auto">
                 <h1 className="text-4xl mb-4">{article.title}</h1>
                 <div className="flex items-center">
                   {article.author.image ? (
@@ -228,20 +228,27 @@ class IndividualArticle extends React.Component {
             </header>
 
             {/* Article Body */}
-            <div className="container mx-auto border-b py-4">
+            <div className="max-w-2xl mx-auto border-b py-4">
               <ReactMarkdown
                 className="prose  prose-a:text-indigo-500 lg:prose-xl"
                 remarkPlugins={[[remarkGfm, { singleTilde: false }]]}
               >
                 {article.body}
               </ReactMarkdown>
-              <p className="text-sm text-gray-500 p-2 border rounded-full inline-block">
-                {article.tagList}
-              </p>
+              <div className="text-sm my-4">
+                {article.tagList.map((tag, index) => (
+                  <span
+                    className="py-2 px-2 border mr-4 inline-block rounded-md"
+                    key={index}
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
             </div>
 
             <footer>
-              <div className="container mx-auto my-6">
+              <div className="max-w-2xl mx-auto my-6">
                 {this.context.user ? (
                   <Comments
                     comments={comments}
