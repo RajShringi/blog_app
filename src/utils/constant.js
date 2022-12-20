@@ -1,4 +1,4 @@
-const ROOT_URL = "https://mighty-oasis-08080.herokuapp.com/api";
+const ROOT_URL = "https://conduit-api.onrender.com/api";
 const articleURL = ROOT_URL + "/articles";
 const singupURL = ROOT_URL + "/users";
 const loginURL = ROOT_URL + "/users/login";
