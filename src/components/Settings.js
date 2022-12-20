@@ -16,6 +16,7 @@ class Settings extends React.Component {
     password: "",
     errors: {
       email: "",
+      password: "",
     },
   };
 
@@ -28,6 +29,11 @@ class Settings extends React.Component {
     switch (name) {
       case "email":
         errors[name] = value.includes("@") ? "" : "email should contain @";
+        break;
+      case "password":
+        errors[name] = !/^(?=.*[a-zA-Z])(?=.*[0-9])/.test(value)
+          ? "Password must contain a letter and a number"
+          : "";
         break;
       default:
         break;
@@ -101,7 +107,7 @@ class Settings extends React.Component {
 
   render() {
     const { image, username, bio, email, password, isLoading } = this.state;
-    const { email: emailError } = this.state.errors;
+    const { email: emailError, password: passwordError } = this.state.errors;
 
     if (isLoading) {
       return <Loader />;
@@ -184,6 +190,9 @@ class Settings extends React.Component {
               value={password}
               onChange={this.handleChagne}
             />
+            <span className="inline-block text-red-400 font-medium text-sm">
+              {passwordError}
+            </span>
           </div>
 
           <div className="flex justify-center my-4">
