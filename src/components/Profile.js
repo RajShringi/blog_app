@@ -1,6 +1,7 @@
 import React from "react";
 import { articleURL, profileURL } from "../utils/constant";
 import { RiUserFollowLine, RiUserUnfollowLine } from "react-icons/ri";
+import { BsEmojiSmile } from "react-icons/bs";
 import { AiOutlineEdit } from "react-icons/ai";
 import Loader from "./Loader";
 import Articles from "./Articles";
@@ -57,7 +58,6 @@ class Profile extends React.Component {
         throw errors;
       }
       const { profile } = await res.json();
-
       const articlesRes = await fetch(
         `${articleURL}?author=${username}&limit=${articlePerPage}&offset=0`
       );
@@ -189,11 +189,23 @@ class Profile extends React.Component {
           <div className="container mx-auto py-4 text-white">
             <div className="max-w-lg text-center mx-auto p-4">
               <div className="flex justify-center items-center mb-4">
-                <img
+                {/* <img
                   className="h-[100px] w-[100px] object-cover rounded-full"
                   src={profile.image}
                   alt={profile.username}
-                />
+                /> */}
+
+                {profile.image ? (
+                  <NavLink to={`/profile/${profile.username}`}>
+                    <img
+                      className="h-[100px] w-[100px] object-cover rounded-full border-2 border-indigo-400 mr-4"
+                      src={profile.image}
+                      alt={profile.username}
+                    />
+                  </NavLink>
+                ) : (
+                  <BsEmojiSmile className="h-10 w-10 text-indigo-400 mr-4" />
+                )}
               </div>
               <h1 className="text-2xl font-bold">{profile.username}</h1>
               <p className="font-light mb-4">{profile.bio}</p>
