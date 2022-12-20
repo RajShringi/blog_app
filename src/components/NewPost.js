@@ -52,7 +52,7 @@ class NewPost extends React.Component {
             title,
             description,
             body,
-            tagList: [...tags.split(",")],
+            tagList: [...tags.split(",").map((tag) => tag.trim())],
           },
         }),
       });
