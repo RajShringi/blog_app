@@ -84,7 +84,7 @@ class Article extends React.Component {
             ) : (
               <p
                 onClick={this.handleLike}
-                className="flex items-center space-x-2 cursor-pointer transition-all"
+                className="flex border p-1 rounded-md items-center space-x-2 cursor-pointer transition-all"
               >
                 <span>{article.favoritesCount}</span>
                 <AiFillHeart
@@ -109,7 +109,16 @@ class Article extends React.Component {
             {article.description && article.description.substring(0, 200)}
             ...
           </p>
-          <p className="text-sm my-4">{article.tagList}</p>
+          <div className="text-sm my-4">
+            {article.tagList.map((tag, index) => (
+              <span
+                className="py-2 px-2 border mr-4 inline-block rounded-md"
+                key={index}
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
           <NavLink to={`/article/${article.slug}`}>
             <button className="text-sm p-2 bg-indigo-400 text-white inline-block rounded-lg hover:bg-indigo-500">
               Read More
